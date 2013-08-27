@@ -54,6 +54,12 @@ public class DeviceDisplay {
         return service[0].getServiceType().getType();
     }
 
+    public Service[] getServices(){
+
+        Service[] service = device.getServices();
+        return service;
+    }
+
     @Override
     public boolean equals(Object o) {
 

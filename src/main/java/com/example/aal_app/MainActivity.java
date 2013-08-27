@@ -47,8 +47,6 @@ public class MainActivity extends ListActivity {
 
     private ListView list;
 
-    ServiceId serviceId = new UDAServiceId("SwitchPower");
-
     private BrowseRegistryListener registryListener = new BrowseRegistryListener();
 
     public static AndroidUpnpService upnpService;
@@ -89,8 +87,6 @@ public class MainActivity extends ListActivity {
 
         list = getListView();
 
-
-
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
@@ -100,10 +96,6 @@ public class MainActivity extends ListActivity {
                 //To change body of implemented methods use File | Settings | File Templates.
                 //final String item = parent.getItemAtPosition(position).toString();
 
-                final ArrayList<String> upnp_device_informations = new ArrayList<String>();
-
-                upnp_device_informations.add(listAdapter.getItem(position).getDeviceName());
-                upnp_device_informations.add(listAdapter.getItem(position).getDeviceDescription());
                 String serviceType_of_device = listAdapter.getItem(position).getServiceTypeOfDevice();
 
                 if (serviceType_of_device.equals("SwitchPower")) {
@@ -113,9 +105,7 @@ public class MainActivity extends ListActivity {
                     startActivity(intent);
                 }
 
-
-
-                showToast(upnp_device_informations.get(0) + " selected!", true);
+                showToast(listAdapter.getItem(position).getDeviceName() + " selected!", true);
             }
         });
     }

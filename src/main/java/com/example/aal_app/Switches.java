@@ -35,7 +35,12 @@ public class Switches extends Activity{
 
     private Service switchPower;
     private ServiceId serviceId = new UDAServiceId("SwitchPower");
+    Device mydevice;
+
     private boolean local_switch_state = false;
+    private String gena_discription;
+    private String gena_service_received_state_status;
+
     private static final String TAG = "TRODIS LOG: ";
 
     @Override
@@ -48,7 +53,7 @@ public class Switches extends Activity{
         int position = extras.getInt(MainActivity.EXTRA_MESSAGE);
 
         DeviceDisplay deviceDisplay = MainActivity.listAdapter.getItem(position);
-        Device mydevice = deviceDisplay.getDevice();
+        mydevice = deviceDisplay.getDevice();
 
         TextView t;
         t = (TextView) findViewById(R.id.upnpSwitch);
@@ -58,7 +63,7 @@ public class Switches extends Activity{
         t.setText("Gerät: " + deviceDisplay.getDeviceName());
 
         t = (TextView) findViewById(R.id.textDeviceDescription);
-        t.setText("UPnP Beschreibung: " + deviceDisplay.getDeviceDescription() );
+        t.setText("UPnP Geräte Beschreibung: " + deviceDisplay.getDeviceDescription() );
 
         this.switchPower = mydevice.findService(serviceId);
 
@@ -90,23 +95,35 @@ public class Switches extends Activity{
 
             public void eventReceived(GENASubscription sub) {
 
-                showToast("Event: " + sub.getCurrentSequence().getValue(), false);
+                gena_discription = sub.getCurrentSequence().getValue().toString();
 
                 Map<String, StateVariableValue> values = sub.getCurrentValues();
                 StateVariableValue status = values.get("Status");
 
-                //assertEquals(status.getDatatype().getClass(), BooleanDatatype.class);
-                //assertEquals(status.getDatatype().getBuiltin(), Datatype.Builtin.BOOLEAN);
+                gena_service_received_state_status = status.toString();
 
                 if(status.toString().equals("1")){
                     local_switch_state = true;
+                    gena_service_received_state_status = "UPnP Device is Turned on";
                 }else{
                     local_switch_state = false;
+                    gena_service_received_state_status = "UPnP Device is Turned off";
                 }
+
                 runOnUiThread(new Runnable() {
                     public void run() {
                         Switch s = (Switch) findViewById(R.id.upnpSwitch);
                         s.setChecked(local_switch_state);
+
+                        TextView t;
+                        t = (TextView) findViewById(R.id.textGENAEvent);
+                        t.setText("Empfangene Events : " + gena_discription);
+
+                        t = (TextView) findViewById(R.id.textServiceStatus);
+                        t.setText("UPnP Gerät Service Status: " + gena_service_received_state_status);
+
+                        t = (TextView) findViewById(R.id.textallServies);
+                        t.setText("All Services of UPnP Device: " + mydevice.getServices()[1]);
                     }
                 });
             }
@@ -129,8 +146,6 @@ public class Switches extends Activity{
         } else {
             executeAction(MainActivity.upnpService, switchPower, false);
         }
-        //MainActivity.upnpService.getControlPoint().execute(getStatusCallback);
-        //showToast(String.valueOf(switch_status), true);
     }
 
 
