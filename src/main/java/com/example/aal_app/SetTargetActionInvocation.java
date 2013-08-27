@@ -15,12 +15,12 @@ import org.teleal.cling.model.types.InvalidValueException;
 
 class SetTargetActionInvocation extends ActionInvocation {
 
-    SetTargetActionInvocation(Service service, boolean value) {
+    SetTargetActionInvocation(Service service, boolean switch_status) {
         super(service.getAction("SetTarget"));
         try {
 
             // Throws InvalidValueException if the value is of wrong type
-            setInput("NewTargetValue", value);
+            setInput("NewTargetValue", switch_status);
 
         } catch (InvalidValueException ex) {
             System.err.println(ex.getMessage());

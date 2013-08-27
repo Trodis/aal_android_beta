@@ -17,23 +17,37 @@ import android.widget.ListView;
 import android.widget.Toast;
 import org.teleal.cling.android.AndroidUpnpService;
 import org.teleal.cling.android.AndroidUpnpServiceImpl;
+import org.teleal.cling.controlpoint.SubscriptionCallback;
+import org.teleal.cling.model.gena.CancelReason;
+import org.teleal.cling.model.gena.GENASubscription;
+import org.teleal.cling.model.message.UpnpResponse;
 import org.teleal.cling.model.meta.*;
+import org.teleal.cling.model.state.StateVariableValue;
+import org.teleal.cling.model.types.BooleanDatatype;
+import org.teleal.cling.model.types.Datatype;
+import org.teleal.cling.model.types.ServiceId;
+import org.teleal.cling.model.types.UDAServiceId;
 import org.teleal.cling.registry.DefaultRegistryListener;
 import org.teleal.cling.registry.Registry;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Map;
 
 public class MainActivity extends ListActivity {
 
     public final static String EXTRA_MESSAGE = "List Position";
+
+    public static Service service;
 
     // private static final Logger log = Logger.getLogger(BrowseActivity.class.getName());
 
     public static ArrayAdapter<DeviceDisplay> listAdapter;
 
     private ListView list;
+
+    ServiceId serviceId = new UDAServiceId("SwitchPower");
 
     private BrowseRegistryListener registryListener = new BrowseRegistryListener();
 
@@ -75,10 +89,13 @@ public class MainActivity extends ListActivity {
 
         list = getListView();
 
+
+
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
 
                 //To change body of implemented methods use File | Settings | File Templates.
                 //final String item = parent.getItemAtPosition(position).toString();
@@ -95,6 +112,8 @@ public class MainActivity extends ListActivity {
                     intent.putExtra(EXTRA_MESSAGE, position);
                     startActivity(intent);
                 }
+
+
 
                 showToast(upnp_device_informations.get(0) + " selected!", true);
             }
@@ -253,5 +272,6 @@ public class MainActivity extends ListActivity {
                     return a.toString().compareTo(b.toString());
                 }
             };
+
 
 }
