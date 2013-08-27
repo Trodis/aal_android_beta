@@ -34,11 +34,12 @@ public class Switches extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.switches);
 
-        /*
+
         Intent intent = getIntent();
         DeviceDisplay device = (DeviceDisplay) intent.getSerializableExtra("Device Object");
 
 
+        /*
         TextView t;
         t = (TextView) findViewById(R.id.upnpSwitch);
         t.setText(device.getDeviceDescription());
