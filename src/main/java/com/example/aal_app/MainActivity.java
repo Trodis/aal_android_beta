@@ -1,5 +1,6 @@
 package com.example.aal_app;
 
+
 import android.os.Bundle;
 import android.app.ListActivity;
 import android.content.ComponentName;
@@ -26,17 +27,17 @@ import java.util.Comparator;
 
 public class MainActivity extends ListActivity {
 
-    public final static String EXTRA_MESSAGE = "Device Object";
+    public final static String EXTRA_MESSAGE = "List Position";
 
     // private static final Logger log = Logger.getLogger(BrowseActivity.class.getName());
 
-    private ArrayAdapter<DeviceDisplay> listAdapter;
+    public static ArrayAdapter<DeviceDisplay> listAdapter;
 
     private ListView list;
 
     private BrowseRegistryListener registryListener = new BrowseRegistryListener();
 
-    private AndroidUpnpService upnpService;
+    public static AndroidUpnpService upnpService;
 
     private ServiceConnection serviceConnection = new ServiceConnection() {
 
@@ -66,6 +67,7 @@ public class MainActivity extends ListActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
+
         super.onCreate(savedInstanceState);
 
         listAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1);
@@ -87,11 +89,10 @@ public class MainActivity extends ListActivity {
                 upnp_device_informations.add(listAdapter.getItem(position).getDeviceDescription());
                 String serviceType_of_device = listAdapter.getItem(position).getServiceTypeOfDevice();
 
-
                 if (serviceType_of_device.equals("SwitchPower")) {
 
                     Intent intent = new Intent(MainActivity.this, Switches.class);
-                    intent.putExtra(EXTRA_MESSAGE, (Serializable) listAdapter.getItem(position).getDevice());
+                    intent.putExtra(EXTRA_MESSAGE, position);
                     startActivity(intent);
                 }
 
@@ -239,6 +240,10 @@ public class MainActivity extends ListActivity {
                 ).show();
             }
         });
+    }
+
+    public ArrayAdapter<DeviceDisplay> getAdapter(){
+        return listAdapter;
     }
 
 
