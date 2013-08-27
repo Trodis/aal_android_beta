@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="fill_parent" android:layout_height="fill_parent"
+              android:orientation="vertical">
+
+
+    <TableRow
+        android:id = "@+id/tableRow1"
+        android:layout_height = "wrap_content"
+        android:layout_width = "match_parent"
+        android:gravity = "center_horizontal">
+
+            <TextView
+                android:id = "@+id/textSwitchesActionsTitle"
+                android:layout_marginTop="9dip"
+                android:layout_marginBottom="9dip"
+                android:layout_width = "match_parent"
+                android:layout_height = "wrap_content"
+                android:textStyle = "normal"
+                android:typeface = "normal"
+                android:textSize = "18dp"
+                android:text = "UPnP Actions"
+                android:gravity = "center"
+                android:layout_span = "6"/>
+
+    </TableRow>
+
+    <TableRow
+        android:id = "@+id/tableRow2"
+        android:layout_width = "wrap_content"
+        android:layout_height = "wrap_content"
+        android:padding = "5dip">
+
+            <Switch
+                android:text = "Standard switch"
+                android:id  = "@+id/upnpSwitch"
+                android:layout_width = "wrap_content"
+                android:layout_height = "wrap_content"
+                android:layout_marginBottom = "32dip"
+                android:layout_marginTop = "5dip"
+                android:onClick="onToggleClicked"/>
+
+    </TableRow>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"/>
+
+    <TableRow
+        android:id = "@+id/tableRow3"
+        android:layout_height = "wrap_content"
+        android:layout_width = "match_parent"
+        android:gravity = "center_horizontal">
+
+            <TextView
+                android:id = "@+id/textSwitchesDeviceDetailsTitle"
+                android:layout_width = "match_parent"
+                android:layout_height = "wrap_content"
+                android:layout_marginTop="9dip"
+                android:layout_marginBottom="9dip"
+                android:textStyle = "normal"
+                android:typeface = "normal"
+                android:textSize = "18dp"
+                android:text = "UPnP Geräte Informationen"
+                android:gravity = "center"
+                android:layout_span = "6">
+
+            </TextView>
+
+    </TableRow>
+
+    <TableRow
+        android:id = "@+id/tableRow4"
+        android:layout_width = "wrap_content"
+        android:layout_height = "wrap_content"
+        android:padding = "5dip">
+
+            <TextView
+                android:id = "@+id/textDeviceName"
+                android:layout_height = "wrap_content"
+                android:layout_width = "wrap_content"
+            />
+
+    </TableRow>
+
+    <TableRow
+        android:id = "@+id/tableRow5"
+        android:layout_width = "wrap_content"
+        android:layout_height = "wrap_content"
+        android:padding = "5dip">
+
+            <TextView
+                android:id = "@+id/textDeviceDescription"
+                android:layout_height = "wrap_content"
+                android:layout_width = "wrap_content"
+            />
+
+    </TableRow>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"/>
+
+
+</TableLayout>
