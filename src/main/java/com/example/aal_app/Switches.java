@@ -60,15 +60,15 @@ public class Switches extends Activity{
         t.setText(deviceDisplay.getServiceTypeOfDevice());
 
         t = (TextView) findViewById(R.id.textDeviceName);
-        t.setText("Gerät: " + deviceDisplay.getDeviceName());
+        t.setText("UPnP Gerät: " + deviceDisplay.getDeviceName());
 
         t = (TextView) findViewById(R.id.textDeviceDescription);
-        t.setText("UPnP Geräte Beschreibung: " + deviceDisplay.getDeviceDescription() );
+        t.setText("UPnP Gerät Beschreibung: " + deviceDisplay.getDeviceDescription() );
 
         this.switchPower = mydevice.findService(serviceId);
 
         if ( this.switchPower != null) {
-           showToast(deviceDisplay.getServiceTypeOfDevice() + " Service ist vorhanden!", false);
+            showToast(deviceDisplay.getServiceTypeOfDevice() + " Service ist vorhanden!", false);
         }
 
         SubscriptionCallback callback = new SubscriptionCallback(switchPower, 600) {
@@ -104,10 +104,10 @@ public class Switches extends Activity{
 
                 if(status.toString().equals("1")){
                     local_switch_state = true;
-                    gena_service_received_state_status = "UPnP Device is Turned on";
+                    gena_service_received_state_status = "UPnP Device ist derzeit eingeschaltet";
                 }else{
                     local_switch_state = false;
-                    gena_service_received_state_status = "UPnP Device is Turned off";
+                    gena_service_received_state_status = "UPnP Device ist derzeit ausgeschaltet";
                 }
 
                 runOnUiThread(new Runnable() {
@@ -116,14 +116,9 @@ public class Switches extends Activity{
                         s.setChecked(local_switch_state);
 
                         TextView t;
-                        t = (TextView) findViewById(R.id.textGENAEvent);
-                        t.setText("Empfangene Events : " + gena_discription);
 
                         t = (TextView) findViewById(R.id.textServiceStatus);
-                        t.setText("UPnP Gerät Service Status: " + gena_service_received_state_status);
-
-                        t = (TextView) findViewById(R.id.textallServies);
-                        t.setText("All Services of UPnP Device: " + mydevice.getServices()[1]);
+                        t.setText(gena_service_received_state_status);
                     }
                 });
             }

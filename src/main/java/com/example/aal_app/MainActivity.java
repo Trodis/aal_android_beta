@@ -103,6 +103,12 @@ public class MainActivity extends ListActivity {
                     Intent intent = new Intent(MainActivity.this, Switches.class);
                     intent.putExtra(EXTRA_MESSAGE, position);
                     startActivity(intent);
+                } else {
+
+                    Intent intent = new Intent(MainActivity.this, UPnPUnknownDevice.class);
+                    intent.putExtra(EXTRA_MESSAGE, position);
+                    startActivity(intent);
+
                 }
 
                 showToast(listAdapter.getItem(position).getDeviceName() + " selected!", true);
