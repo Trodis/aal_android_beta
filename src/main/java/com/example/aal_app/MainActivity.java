@@ -96,20 +96,25 @@ public class MainActivity extends ListActivity {
                 //To change body of implemented methods use File | Settings | File Templates.
                 //final String item = parent.getItemAtPosition(position).toString();
 
-                String serviceType_of_device = listAdapter.getItem(position).getServiceTypeOfDevice();
+                Service[] services_of_device = listAdapter.getItem(position).getDevice().getServices();
+                int service_counter = 1;
 
-                if (serviceType_of_device.equals("SwitchPower")) {
+                for (Service services : services_of_device)
 
-                    Intent intent = new Intent(MainActivity.this, Switches.class);
-                    intent.putExtra(EXTRA_MESSAGE, position);
-                    startActivity(intent);
-                } else {
+                    if ( services.getServiceType().getType().equals("SwitchPower") ) {
 
-                    Intent intent = new Intent(MainActivity.this, UPnPUnknownDevice.class);
-                    intent.putExtra(EXTRA_MESSAGE, position);
-                    startActivity(intent);
+                        Intent intent = new Intent(MainActivity.this, Switches.class);
+                        intent.putExtra(EXTRA_MESSAGE, position);
+                        startActivity(intent);
+                        break;
 
-                }
+                    } else if (service_counter++ == services_of_device.length) {
+
+                        Intent intent = new Intent(MainActivity.this, UPnPUnknownDevice.class);
+                        intent.putExtra(EXTRA_MESSAGE, position);
+                        startActivity(intent);
+                        break;
+                    }
 
                 showToast(listAdapter.getItem(position).getDeviceName() + " selected!", true);
             }
