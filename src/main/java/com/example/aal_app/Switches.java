@@ -68,7 +68,7 @@ public class Switches extends Activity{
         }
 
         /*
-        t = (TextView) findViewById(R.id.textDeviceName);
+        t = (TextView) fiViewById(R.id.textDeviceName);
         t.setText("UPnP Gerät: " + deviceDisplay.getDeviceName());
 
         t = (TextView) findViewById(R.id.textDeviceDescription);
