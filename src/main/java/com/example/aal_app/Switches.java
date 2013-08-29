@@ -83,7 +83,13 @@ public class Switches extends Activity{
             createSwitches();
         } else {
 
+<<<<<<< HEAD
             showToast("Warnung! Service / ServiceID wurde nicht gefunden!", true);
+=======
+        /*
+        t = (TextView) fiViewById(R.id.textDeviceName);
+        t.setText("UPnP Gerät: " + deviceDisplay.getDeviceName());
+>>>>>>> refs/remotes/origin/master
 
             LinearLayout ll = (LinearLayout) findViewById(R.id.LinearLayoutUPnPActionElements);
 
