@@ -15,10 +15,7 @@ import org.teleal.cling.model.action.ActionInvocation;
 import org.teleal.cling.model.gena.CancelReason;
 import org.teleal.cling.model.gena.GENASubscription;
 import org.teleal.cling.model.message.UpnpResponse;
-import org.teleal.cling.model.meta.Action;
-import org.teleal.cling.model.meta.Device;
-import org.teleal.cling.model.meta.Service;
-import org.teleal.cling.model.meta.StateVariable;
+import org.teleal.cling.model.meta.*;
 import org.teleal.cling.model.state.StateVariableValue;
 import org.teleal.cling.model.types.*;
 
@@ -35,13 +32,16 @@ public class Switches extends Activity{
 
     private Service switchPower;
     private ServiceId serviceId = new UDAServiceId("SwitchPower");
-    Device mydevice;
 
     private boolean local_switch_state = false;
     private String gena_discription;
     private String gena_service_received_state_status;
 
     private static final String TAG = "TRODIS LOG: ";
+
+    private DeviceDisplay deviceDisplay;
+    private Device upnp_device;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,24 +52,35 @@ public class Switches extends Activity{
         Bundle extras = getIntent().getExtras();
         int position = extras.getInt(MainActivity.EXTRA_MESSAGE);
 
-        DeviceDisplay deviceDisplay = MainActivity.listAdapter.getItem(position);
-        mydevice = deviceDisplay.getDevice();
+        this.deviceDisplay = MainActivity.listAdapter.getItem(position);
+        this.upnp_device = deviceDisplay.getDevice();
 
-        TextView t;
-        t = (TextView) findViewById(R.id.upnpSwitch);
-        t.setText(deviceDisplay.getServiceTypeOfDevice());
+        for (Service services : upnp_device.findServices()) {
+            for (Action actions : services.getActions()){
+                for (ActionArgument actionArgument : actions.getArguments()){
+                    Log.v(TAG, services.getServiceType().getType() + ": " + actions.getName() + ": " + actionArgument.getName()  );
+                }
+            }
+        }
 
+        if (deviceDisplay != null){
+            createUPnPInformations();
+        }
+
+        /*
         t = (TextView) findViewById(R.id.textDeviceName);
         t.setText("UPnP Gerät: " + deviceDisplay.getDeviceName());
 
         t = (TextView) findViewById(R.id.textDeviceDescription);
         t.setText("UPnP Gerät Beschreibung: " + deviceDisplay.getDeviceDescription() );
-
-        this.switchPower = mydevice.findService(serviceId);
+         */
+        this.switchPower = upnp_device.findService(serviceId);
 
         if ( this.switchPower != null) {
             showToast(deviceDisplay.getServiceTypeOfDevice() + " Service ist vorhanden!", false);
+            createSwitches();
         }
+
 
         SubscriptionCallback callback = new SubscriptionCallback(switchPower, 600) {
 
@@ -112,13 +123,12 @@ public class Switches extends Activity{
 
                 runOnUiThread(new Runnable() {
                     public void run() {
-                        Switch s = (Switch) findViewById(R.id.upnpSwitch);
+
+
+                        Switch s = (Switch) findViewById(1);
                         s.setChecked(local_switch_state);
 
-                        TextView t;
 
-                        t = (TextView) findViewById(R.id.textServiceStatus);
-                        t.setText(gena_service_received_state_status);
                     }
                 });
             }
@@ -132,8 +142,46 @@ public class Switches extends Activity{
         MainActivity.upnpService.getControlPoint().execute(callback);
     }
 
+    public void createSwitches()
+    {
+            LinearLayout ll = (LinearLayout) findViewById(R.id.LinearLayoutUPnPActionElements);
+
+            Switch s = new Switch(this);
+            s.setText(deviceDisplay.getServiceTypeOfDevice());
+            s.setId(1);
+            s.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                    if(isChecked){
+                        executeAction(MainActivity.upnpService, switchPower, true);
+                    } else {
+                        executeAction(MainActivity.upnpService, switchPower, false);
+                    }
+                }
+            });
+            ll.addView(s);
+    }
+
+    public void createUPnPInformations(){
+
+        LinearLayout ll;
+
+        ll = (LinearLayout) findViewById(R.id.LinearLayoutUPnPDeviceInformations);
+
+        TextView t = new TextView(this);
+        t.setText(deviceDisplay.getServiceTypeOfDevice());
+        ll.addView(t);
+
+        t = new TextView(this);
+        t.setText(deviceDisplay.getDeviceName());
+        ll.addView(t);
+
+    }
+
+    /*
     public void onToggleClicked(View view) {
-        Switch mySwitch = (Switch) view; //Referenz vom Switch Objekt, um damit zu interagieren
+        Switch mySwitch = (Switch) view.getId(""); //Referenz vom Switch Objekt, um damit zu interagieren
         boolean switch_is_on = mySwitch.isChecked();
 
         if (switch_is_on) {
@@ -142,7 +190,7 @@ public class Switches extends Activity{
             executeAction(MainActivity.upnpService, switchPower, false);
         }
     }
-
+    */
 
     protected void executeAction(AndroidUpnpService upnpService, Service switchPowerService, boolean switch_status){
 
