@@ -97,23 +97,18 @@ public class MainActivity extends ListActivity {
                 //final String item = parent.getItemAtPosition(position).toString();
 
                 Service[] services_of_device = listAdapter.getItem(position).getDevice().getServices();
-                int service_counter = 1;
 
-                for (Service services : services_of_device)
-
-                    if ( services.getServiceType().getType().equals("SwitchPower") ) {
+                    if ( services_of_device != null ) {
 
                         Intent intent = new Intent(MainActivity.this, Switches.class);
                         intent.putExtra(EXTRA_MESSAGE, position);
                         startActivity(intent);
-                        break;
 
-                    } else if (service_counter++ == services_of_device.length) {
+                    } else {
 
                         Intent intent = new Intent(MainActivity.this, UPnPUnknownDevice.class);
                         intent.putExtra(EXTRA_MESSAGE, position);
                         startActivity(intent);
-                        break;
                     }
 
                 showToast(listAdapter.getItem(position).getDeviceName() + " selected!", true);
@@ -260,10 +255,6 @@ public class MainActivity extends ListActivity {
                 ).show();
             }
         });
-    }
-
-    public ArrayAdapter<DeviceDisplay> getAdapter(){
-        return listAdapter;
     }
 
 

@@ -3,6 +3,7 @@ package com.example.aal_app;
 import android.app.Activity;
 import android.app.ListActivity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -30,8 +31,8 @@ import java.util.Map;
  */
 public class Switches extends Activity{
 
-    private Service switchPower;
-    private ServiceId serviceId = new UDAServiceId("SwitchPower");
+    private Service service_switch_power;
+
 
     private boolean local_switch_state = false;
     private String gena_discription;
@@ -39,7 +40,7 @@ public class Switches extends Activity{
 
     private static final String TAG = "TRODIS LOG: ";
 
-    private DeviceDisplay deviceDisplay;
+    private DeviceDisplay device_display;
     private Device upnp_device;
 
 
@@ -50,39 +51,51 @@ public class Switches extends Activity{
         setContentView(R.layout.switches);
 
         Bundle extras = getIntent().getExtras();
-        int position = extras.getInt(MainActivity.EXTRA_MESSAGE);
+        int item_position = extras.getInt(MainActivity.EXTRA_MESSAGE);
 
-        this.deviceDisplay = MainActivity.listAdapter.getItem(position);
-        this.upnp_device = deviceDisplay.getDevice();
+        this.device_display = MainActivity.listAdapter.getItem(item_position);
+        this.upnp_device = device_display.getDevice();
 
-        for (Service services : upnp_device.findServices()) {
-            for (Action actions : services.getActions()){
-                for (ActionArgument actionArgument : actions.getArguments()){
-                    Log.v(TAG, services.getServiceType().getType() + ": " + actions.getName() + ": " + actionArgument.getName()  );
+        if (device_display != null){
+            for (Service services : upnp_device.getServices()) {
+
+                if(services.getServiceType().getType().equals("SwitchPower")){
+                    this.service_switch_power = upnp_device.findService(services.getServiceId());
+                } else {
+
+                    LinearLayout ll = (LinearLayout) findViewById(R.id.LinearLayoutUPnPActionElements);
+
+                    TextView tv = new TextView(this);
+                    tv.setText("No Service SwitchPower found, can not create Switches!");
+                    tv.setTextColor(Color.rgb(200, 0, 0));
+                    tv.setTextSize(22);
+
+                    ll.addView(tv);
+                    break;
                 }
             }
+            createUPnPServiceandActionInformations(device_display);
         }
 
-        if (deviceDisplay != null){
-            createUPnPInformations();
-        }
+        if ( this.service_switch_power != null) {
 
-        /*
-        t = (TextView) findViewById(R.id.textDeviceName);
-        t.setText("UPnP Gerät: " + deviceDisplay.getDeviceName());
-
-        t = (TextView) findViewById(R.id.textDeviceDescription);
-        t.setText("UPnP Gerät Beschreibung: " + deviceDisplay.getDeviceDescription() );
-         */
-        this.switchPower = upnp_device.findService(serviceId);
-
-        if ( this.switchPower != null) {
-            showToast(deviceDisplay.getServiceTypeOfDevice() + " Service ist vorhanden!", false);
+            showToast(service_switch_power.getServiceType().getType() + " Service ist vorhanden!", false);
             createSwitches();
+        } else {
+
+            showToast("Warnung! Service / ServiceID wurde nicht gefunden!", true);
+
+            LinearLayout ll = (LinearLayout) findViewById(R.id.LinearLayoutUPnPActionElements);
+
+            TextView tv = new TextView(this);
+            tv.setText("Keine Switches weil: new UDAServiceID -> " + this.service_switch_power);
+            tv.setTextColor(Color.rgb(200, 0, 0));
+
+            ll.addView(tv);
         }
 
 
-        SubscriptionCallback callback = new SubscriptionCallback(switchPower, 600) {
+        SubscriptionCallback callback = new SubscriptionCallback(service_switch_power, 600) {
 
             @Override
             public void established(GENASubscription sub) {
@@ -94,7 +107,7 @@ public class Switches extends Activity{
                                   UpnpResponse responseStatus,
                                   Exception exception,
                                   String defaultMsg) {
-                System.err.println(defaultMsg);
+                showToast(defaultMsg, true);
             }
 
             @Override
@@ -109,7 +122,7 @@ public class Switches extends Activity{
                 gena_discription = sub.getCurrentSequence().getValue().toString();
 
                 Map<String, StateVariableValue> values = sub.getCurrentValues();
-                StateVariableValue status = values.get("Status");
+                StateVariableValue status = values.get("status");
 
                 gena_service_received_state_status = status.toString();
 
@@ -123,12 +136,8 @@ public class Switches extends Activity{
 
                 runOnUiThread(new Runnable() {
                     public void run() {
-
-
                         Switch s = (Switch) findViewById(1);
                         s.setChecked(local_switch_state);
-
-
                     }
                 });
             }
@@ -147,50 +156,66 @@ public class Switches extends Activity{
             LinearLayout ll = (LinearLayout) findViewById(R.id.LinearLayoutUPnPActionElements);
 
             Switch s = new Switch(this);
-            s.setText(deviceDisplay.getServiceTypeOfDevice());
+            s.setText(device_display.getServiceTypeOfDevice());
             s.setId(1);
             s.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
-                    if(isChecked){
-                        executeAction(MainActivity.upnpService, switchPower, true);
+                    if (isChecked) {
+                        executeAction(MainActivity.upnpService, service_switch_power, true);
                     } else {
-                        executeAction(MainActivity.upnpService, switchPower, false);
+                        executeAction(MainActivity.upnpService, service_switch_power, false);
                     }
                 }
             });
             ll.addView(s);
     }
 
-    public void createUPnPInformations(){
+    public void createUPnPServiceandActionInformations(DeviceDisplay device_display){
 
         LinearLayout ll;
-
         ll = (LinearLayout) findViewById(R.id.LinearLayoutUPnPDeviceInformations);
+        TextView tv;
 
-        TextView t = new TextView(this);
-        t.setText(deviceDisplay.getServiceTypeOfDevice());
-        ll.addView(t);
+        for (Service services : device_display.getServices()){
 
-        t = new TextView(this);
-        t.setText(deviceDisplay.getDeviceName());
-        ll.addView(t);
+            tv = new TextView(this);
+            tv.setText("Service " + services.getServiceType().getType() + ":");
+            tv.setHighlightColor(1);
+            tv.setTextColor(Color.rgb(50, 205, 50));
+            tv.setTextSize(17);
+            ll.addView(tv);
 
-    }
-
-    /*
-    public void onToggleClicked(View view) {
-        Switch mySwitch = (Switch) view.getId(""); //Referenz vom Switch Objekt, um damit zu interagieren
-        boolean switch_is_on = mySwitch.isChecked();
-
-        if (switch_is_on) {
-            executeAction(MainActivity.upnpService, switchPower, true);
-        } else {
-            executeAction(MainActivity.upnpService, switchPower, false);
+            for(Action actions : services.getActions()){
+                tv = new TextView(this);
+                tv.setText(actions.getName());
+                tv.setTextSize(15);
+                ll.addView(tv);
+            }
         }
+
+        createUPnPGeneralInformations(device_display);
     }
-    */
+
+    public void createUPnPGeneralInformations(DeviceDisplay deviceDisplay){
+
+        LinearLayout ll;
+        ll = (LinearLayout) findViewById(R.id.LinearLayoutUPnPDeviceGeneralInformations);
+
+        TextView tv;
+
+        tv = new TextView(this);
+        tv.setText("Device Name: " +deviceDisplay.getDeviceName());
+        tv.setTextSize(15);
+
+        tv = new TextView(this);
+        tv.setText("Device Discription: " +deviceDisplay.getDeviceDescription());
+        tv.setTextSize(15);
+
+        ll.addView(tv);
+
+    }
 
     protected void executeAction(AndroidUpnpService upnpService, Service switchPowerService, boolean switch_status){
 
@@ -204,14 +229,14 @@ public class Switches extends Activity{
                     @Override
                     public void success(ActionInvocation invocation) {
                         assert invocation.getOutput().length == 0;
-                        System.out.println("Successfully called action!");
+                        showToast("Successfully called action!", false);
                     }
 
                     @Override
                     public void failure(ActionInvocation invocation,
                                         UpnpResponse operation,
                                         String defaultMsg) {
-                        System.err.println(defaultMsg);
+                        showToast(defaultMsg, true);
                     }
                 }
         );
