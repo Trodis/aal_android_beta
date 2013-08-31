@@ -39,8 +39,6 @@ public class MainActivity extends ListActivity {
 
     public final static String EXTRA_MESSAGE = "List Position";
 
-    public static Service service;
-
     // private static final Logger log = Logger.getLogger(BrowseActivity.class.getName());
 
     public static ArrayAdapter<DeviceDisplay> listAdapter;

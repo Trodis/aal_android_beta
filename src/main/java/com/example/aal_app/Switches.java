@@ -31,7 +31,7 @@ import java.util.Map;
  */
 public class Switches extends Activity{
 
-    private Service service_switch_power;
+    //private Service service_from_upnp_device;
 
 
     private boolean local_switch_state = false;
@@ -42,6 +42,12 @@ public class Switches extends Activity{
 
     private DeviceDisplay device_display;
     private Device upnp_device;
+    private Service current_upnp_device_service;
+    private String action_of_upnp_device;
+    private Action[] actions;
+    private String argument_of_action_from_upnp_device;
+    private String related_state_variable_input_action;
+    private String related_state_variable_output_action;
 
 
     @Override
@@ -57,120 +63,47 @@ public class Switches extends Activity{
         this.upnp_device = device_display.getDevice();
 
         if (device_display != null){
-            for (Service services : upnp_device.getServices()) {
-
-                if(services.getServiceType().getType().equals("SwitchPower")){
-                    this.service_switch_power = upnp_device.findService(services.getServiceId());
-                } else {
-
-                    LinearLayout ll = (LinearLayout) findViewById(R.id.LinearLayoutUPnPActionElements);
-
-                    TextView tv = new TextView(this);
-                    tv.setText("No Service SwitchPower found, can not create Switches!");
-                    tv.setTextColor(Color.rgb(200, 0, 0));
-                    tv.setTextSize(22);
-
-                    ll.addView(tv);
-                    break;
+            for (Service service : upnp_device.getServices()) {
+                for(Action action : service.getActions()){
+                    generateUI(action);
                 }
-            }
             createUPnPServiceandActionInformations(device_display);
-        }
-
-        if ( this.service_switch_power != null) {
-
-            showToast(service_switch_power.getServiceType().getType() + " Service ist vorhanden!", false);
-            createSwitches();
-        } else {
-
-            showToast("Warnung! Service / ServiceID wurde nicht gefunden!", true);
-
-            LinearLayout ll = (LinearLayout) findViewById(R.id.LinearLayoutUPnPActionElements);
-
-            TextView tv = new TextView(this);
-            tv.setText("Keine Switches weil: new UDAServiceID -> " + this.service_switch_power);
-            tv.setTextColor(Color.rgb(200, 0, 0));
-
-            ll.addView(tv);
-        }
-
-
-        SubscriptionCallback callback = new SubscriptionCallback(service_switch_power, 600) {
-
-            @Override
-            public void established(GENASubscription sub) {
-                showToast("Established: " + sub.getSubscriptionId(), false);
-            }
-
-            @Override
-            protected void failed(GENASubscription subscription,
-                                  UpnpResponse responseStatus,
-                                  Exception exception,
-                                  String defaultMsg) {
-                showToast(defaultMsg, true);
-            }
-
-            @Override
-            public void ended(GENASubscription sub,
-                              CancelReason reason,
-                              UpnpResponse response) {
-                assert reason == null;
-            }
-
-            public void eventReceived(GENASubscription sub) {
-
-                gena_discription = sub.getCurrentSequence().getValue().toString();
-
-                Map<String, StateVariableValue> values = sub.getCurrentValues();
-                StateVariableValue status = values.get("status");
-
-                gena_service_received_state_status = status.toString();
-
-                if(status.toString().equals("1")){
-                    local_switch_state = true;
-                    gena_service_received_state_status = "UPnP Device ist derzeit eingeschaltet";
-                }else{
-                    local_switch_state = false;
-                    gena_service_received_state_status = "UPnP Device ist derzeit ausgeschaltet";
-                }
-
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        Switch s = (Switch) findViewById(1);
-                        s.setChecked(local_switch_state);
-                    }
-                });
-            }
-
-            public void eventsMissed(GENASubscription sub, int numberOfMissedEvents) {
-                showToast("Missed events: " + numberOfMissedEvents, false);
-            }
-
-        };
-
-        MainActivity.upnpService.getControlPoint().execute(callback);
+          }
+       }
     }
 
-    public void createSwitches()
+
+    public void createInputActions( final Action action, final ActionArgument action_argument)
     {
-            LinearLayout ll = (LinearLayout) findViewById(R.id.LinearLayoutUPnPActionElements);
+        LinearLayout ll = (LinearLayout) findViewById(R.id.LinearLayoutUPnPActionElements);
 
-            Switch s = new Switch(this);
-            s.setText(device_display.getServiceTypeOfDevice());
-            s.setId(1);
-            s.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        Switch s = new Switch(this);
+        s.setText(action.getName());
+        s.setId(action.hashCode());
+        s.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
-                    if (isChecked) {
-                        executeAction(MainActivity.upnpService, service_switch_power, true);
-                    } else {
-                        executeAction(MainActivity.upnpService, service_switch_power, false);
-                    }
+                if (isChecked) {
+                    executeAction(MainActivity.upnpService, action.getService(), action, action_argument, true);
+                } else {
+                    executeAction(MainActivity.upnpService, action.getService(), action, action_argument, false);
                 }
-            });
-            ll.addView(s);
+            }
+        });
+        ll.addView(s);
+
+        if(action.getService().hasStateVariables()){
+            for (StateVariable state_variable : action.getService().getStateVariables()){
+                if(state_variable.getEventDetails().isSendEvents()){
+                    startEventlistening(action, state_variable, action.hashCode());
+                    Log.v(TAG, "STATEVARIABLE: " + state_variable);
+                }
+            }
+        }
     }
+
+
 
     public void createUPnPServiceandActionInformations(DeviceDisplay device_display){
 
@@ -217,10 +150,10 @@ public class Switches extends Activity{
 
     }
 
-    protected void executeAction(AndroidUpnpService upnpService, Service switchPowerService, boolean switch_status){
+    protected void executeAction(AndroidUpnpService upnpService, Service service, Action action, ActionArgument action_argument, boolean switch_status){
 
         ActionInvocation setTargetInvocation =
-                new SetTargetActionInvocation(switchPowerService, switch_status);
+                new SetTargetActionInvocation(service, action, action_argument, switch_status);
 
         // Executes asynchronous in the background
         upnpService.getControlPoint().execute(
@@ -241,6 +174,35 @@ public class Switches extends Activity{
                 }
         );
     }
+
+
+    public void setSwitch(final boolean is_checked, final int switchId){
+
+        runOnUiThread(new Runnable() {
+            public void run() {
+                Switch s = (Switch) findViewById(switchId);
+                s.setChecked(is_checked);
+            }
+        });
+    }
+
+    private void startEventlistening(Action action, StateVariable state_variable, int buttonID ){
+        if (action != null) {
+            SubscriptionCallback callback = new SwitchPowerSubscriptionCallback(action, state_variable, this, buttonID);
+            MainActivity.upnpService.getControlPoint().execute(callback);
+        }
+    }
+
+    private void generateUI(Action action){
+        if (action.hasInputArguments()){
+            for (ActionArgument action_argument : action.getInputArguments()){
+                if(action_argument.getDatatype().getBuiltin().equals(Datatype.Builtin.BOOLEAN)){
+                    createInputActions(action, action_argument);
+                }
+            }
+        }
+    }
+
 
     protected void showToast(final String msg, final boolean longLength) {
 

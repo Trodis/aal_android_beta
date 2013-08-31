@@ -47,13 +47,6 @@ public class DeviceDisplay {
         return device.getDetails().getModelDetails().getModelDescription();
     }
 
-    public String getServiceTypeOfDevice(){
-
-        Service[] service = device.getServices();
-
-        return service[0].getServiceType().getType();
-    }
-
     public Service[] getServices(){
 
         Service[] service = device.getServices();
