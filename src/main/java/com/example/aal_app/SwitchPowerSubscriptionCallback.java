@@ -27,7 +27,7 @@ public class SwitchPowerSubscriptionCallback extends SubscriptionCallback {
     StateVariable state_variable;
     int buttonID;
 
-    public SwitchPowerSubscriptionCallback(Action action, StateVariable state_variable, Switches switches, int buttonID){
+    public SwitchPowerSubscriptionCallback(Action action, StateVariable state_variable, Switches switches){
 
         super(action.getService(), 600);
         this.action         = action;
@@ -66,12 +66,12 @@ public class SwitchPowerSubscriptionCallback extends SubscriptionCallback {
 
         if (state_Variable_Value.getValue() != null){
             Log.v("", "DEBUG DEBUG:::::::"+state_Variable_Value.getValue());
-            if (state_Variable_Value.getDatatype().getBuiltin().equals(Datatype.Builtin.BOOLEAN)){
+            if (state_Variable_Value.getDatatype().getBuiltin().equals(Datatype.Builtin.BOOLEAN )){
 
                 if((Boolean) state_Variable_Value.getValue()){
-                    switches.setSwitch(true, buttonID);
+                    switches.setSwitch(true, action);
                 } else {
-                    switches.setSwitch(false, buttonID);
+                    switches.setSwitch(false, action);
                 }
 
 

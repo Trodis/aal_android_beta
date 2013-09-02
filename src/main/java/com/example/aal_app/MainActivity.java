@@ -37,7 +37,7 @@ import java.util.Map;
 
 public class MainActivity extends ListActivity {
 
-    public final static String EXTRA_MESSAGE = "List Position";
+    public final static String EXTRA_MESSAGE = "UPNP Device";
 
     // private static final Logger log = Logger.getLogger(BrowseActivity.class.getName());
 
@@ -94,22 +94,18 @@ public class MainActivity extends ListActivity {
                 //To change body of implemented methods use File | Settings | File Templates.
                 //final String item = parent.getItemAtPosition(position).toString();
 
-                Service[] services_of_device = listAdapter.getItem(position).getDevice().getServices();
+                String unique_device_identifier = listAdapter.getItem(position).getDevice().getIdentity().getUdn().getIdentifierString();
 
-                if ( services_of_device != null ) {
+                if (listAdapter.getItem(position).getDevice().isRoot()){
 
                     Intent intent = new Intent(MainActivity.this, Switches.class);
-                    intent.putExtra(EXTRA_MESSAGE, position);
+                    intent.putExtra(EXTRA_MESSAGE, unique_device_identifier);
                     startActivity(intent);
+                    showToast(listAdapter.getItem(position).getDeviceName() + " selected!", true);
 
                 } else {
-
-                    Intent intent = new Intent(MainActivity.this, UPnPUnknownDevice.class);
-                    intent.putExtra(EXTRA_MESSAGE, position);
-                    startActivity(intent);
+                    showToast("This UPnP Device is not a root device!!!", true);
                 }
-
-                showToast(listAdapter.getItem(position).getDeviceName() + " selected!", true);
             }
         });
     }

@@ -2,9 +2,13 @@ package com.example.aal_app;
 
 import android.app.Activity;
 import android.app.ListActivity;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
 import android.widget.*;
@@ -33,15 +37,31 @@ import java.util.Map;
 public class Switches extends Activity{
 
     //private Service service_from_upnp_device;
+    public final static String EXTRA_MESSAGE = "UPNP Device";
     private static final String TAG = "TRODIS LOG: ";
 
-    private DeviceDisplay device_display;
     private Device upnp_device;
     private ArrayList input_value;
     private ArrayAdapter<DeviceDisplay> listAdapter;
 
     private AndroidUpnpService upnpService;
+    private SubscriptionCallback callback;
+    private String unique_device_identifier;
+    private Bundle savedInstanceState;
 
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+
+        public void onServiceConnected(ComponentName className, IBinder service) {
+
+            upnpService = (AndroidUpnpService) service;
+            onResume();
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+
+            upnpService = null;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,49 +70,73 @@ public class Switches extends Activity{
         setContentView(R.layout.switches);
 
         Bundle extras = getIntent().getExtras();
-        int item_position = extras.getInt(MainActivity.EXTRA_MESSAGE);
 
-        this.device_display = MainActivity.listAdapter.getItem(item_position);
-        this.listAdapter    = MainActivity.listAdapter;;
-        this.device_display = listAdapter.getItem(item_position);
-        this.upnp_device = device_display.getDevice();
-        this.upnpService = MainActivity.upnpService;
-        this.input_value = new ArrayList();
+
+        this.unique_device_identifier = extras.getString(EXTRA_MESSAGE);
+        this.savedInstanceState = savedInstanceState;
+        input_value = new ArrayList();
+
     }
 
     @Override
     protected void onResume(){
         super.onResume();
+        if (upnpService != null && savedInstanceState == null)
+            upnp_device = upnpService.getRegistry().getDevice(UDN.valueOf(unique_device_identifier), true);
 
-        if (device_display != null){
-            createUPnPServiceandActionInformations(device_display);
+        if (this.upnp_device != null){
+            createUPnPServiceandActionInformations(upnp_device);
             for (Service service : upnp_device.getServices()) {
                 for(Action action : service.getActions()){
                     generateUI(action);
                 }
             }
+        } else {
+            this.savedInstanceState = null;
+            onCreate(savedInstanceState);
         }
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        getApplicationContext().bindService(
+                new Intent(this, AndroidUpnpServiceImpl.class),
+                serviceConnection,
+                Context.BIND_AUTO_CREATE
+        );
     }
 
     @Override protected void onDestroy(){
-        this.device_display = null;
-        this.listAdapter    = null;
-        this.device_display = null;
-        this.upnp_device = null;
-        this.upnpService = null;
-        this.input_value = null;
+        super.onDestroy();
+        if (upnpService != null){
+
+            getApplicationContext().unbindService(serviceConnection);
+            this.listAdapter    = null;
+            this.upnp_device = null;
+            this.upnpService = null;
+            this.input_value = null;
+        }
+
+        if (callback != null){
+            callback.end();
+        }
+
     }
 
-    @Override protected void onPause(){
+
+    @Override
+    protected void onPause(){
         super.onPause();
-        finish();
+        onDestroy();
     }
 
 
-    protected void executeAction(AndroidUpnpService upnpService, Service service, Action action, ActionArgument action_argument, ArrayList input_value){
+    protected void executeAction(AndroidUpnpService upnpService, Service service, Action action, ActionArgument action_argument, ArrayList input_value, boolean isInput){
 
         ActionInvocation setTargetInvocation =
-                new SetTargetActionInvocation(service, action, action_argument, input_value);
+                new SetTargetActionInvocation(service, action, action_argument, input_value, isInput);
 
 
         // Executes asynchronous in the background
@@ -118,38 +162,56 @@ public class Switches extends Activity{
     public void createInputActions( final Action action, final ActionArgument action_argument) {
         LinearLayout ll = (LinearLayout) findViewById(R.id.LinearLayoutUPnPActionElements);
 
-        ToggleButton tb = new ToggleButton(this);
-        tb.setText(action.getName());
-        tb.setId(action.hashCode());
-        tb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        Switch button = new Switch(this);
+        button.setText(action.getName());
+        button.setTag(action.getName());
+        button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
                 if (isChecked) {
                     input_value.add(true);
-                    executeAction(upnpService, action.getService(), action, action_argument, input_value);
+                    executeAction(upnpService, action.getService(), action, action_argument, input_value, true);
                     input_value.clear();
                 } else {
                     input_value.add(false);
-                    executeAction(upnpService, action.getService(), action, action_argument, input_value);
+                    executeAction(upnpService, action.getService(), action, action_argument, input_value, true);
                     input_value.clear();
                 }
             }
         });
-        ll.addView(tb);
+        ll.addView(button);
+    }
+
+    public void createOutPutActions( final Action action, final ActionArgument action_argument){
+
+        LinearLayout ll = (LinearLayout) findViewById(R.id.LinearLayoutUPnPOutputActionElements);
+
+        Button button = new Button(this);
+        button.setText(action.getName());
+        button.setTag(action.getName());
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                executeAction(upnpService, action.getService(), action, action_argument, input_value, false);
+            }
+        });
+
+        ll.addView(button);
+
     }
 
     public void createSeekBarActions(final  Action action, final ActionArgument action_argument){
         LinearLayout ll = (LinearLayout) findViewById(R.id.LinearLayoutUPnPSeekBar);
 
         SeekBar sb = new SeekBar(this);
-        sb.setId(action.hashCode());
+        sb.setTag(action.getName());
         sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 //To change body of implemented methods use File | Settings | File Templates.
-                input_value.add("" + progress);
-                executeAction(upnpService, action.getService(), action, action_argument, input_value);
+                input_value.add(String.valueOf(progress));
+                executeAction(upnpService, action.getService(), action, action_argument, input_value, true);
                 input_value.clear();
             }
 
@@ -167,23 +229,24 @@ public class Switches extends Activity{
     }
 
 
-    public void setSwitch(final boolean is_checked, final int switchId){
+    public void setSwitch(final boolean is_checked,final Action action){
 
         runOnUiThread(new Runnable() {
             public void run() {
-                ToggleButton tb = (ToggleButton) findViewById(switchId);
-                tb.setChecked(is_checked);
+
+                final View ll = findViewById(R.id.LinearLayoutUPnPActionElements);
+                Switch mySwitch;
+                mySwitch = (Switch) ll.findViewWithTag(action.getName());
+                mySwitch.setChecked(is_checked);
             }
         });
     }
 
 
 
-    private void startEventlistening(Action action, StateVariable state_variable, int buttonID ){
-            SubscriptionCallback callback = new SwitchPowerSubscriptionCallback(action, state_variable, this, buttonID);
-
-            //upnpService.getControlPoint().execute(callback);
-
+    private void startEventlistening(Action action, StateVariable state_variable){
+            this.callback = new SwitchPowerSubscriptionCallback(action, state_variable, this);
+            upnpService.getControlPoint().execute(callback);
     }
 
 
@@ -192,7 +255,7 @@ public class Switches extends Activity{
         if(action.getService().hasStateVariables()){
             for (StateVariable state_variable : action.getService().getStateVariables()){
                 if(state_variable.getEventDetails().isSendEvents()){
-                    startEventlistening(action, state_variable, action.hashCode());
+                    startEventlistening(action, state_variable);
                     Log.v(TAG, "STATEVARIABLE: " + state_variable);
                 }
             }
@@ -200,17 +263,27 @@ public class Switches extends Activity{
     }
 
     private void generateUI(Action action){
-        if (action.hasInputArguments()){
+
             for (ActionArgument action_argument : action.getInputArguments()){
+
                 if(action_argument.getDatatype().getBuiltin().equals(Datatype.Builtin.BOOLEAN)) {
+
                     createInputActions(action, action_argument);
                     createSwitchPowerSubscription(action);
+
                 } else if (action_argument.getDatatype().getBuiltin().equals(Datatype.Builtin.UI1)) {
+
                     createSeekBarActions(action, action_argument);
                     createSwitchPowerSubscription(action);
+
                 }
             }
-        }
+
+
+            for (ActionArgument action_argument : action.getOutputArguments()){
+
+                createOutPutActions(action, action_argument);
+            }
     }
 
     protected void showToast(final String msg, final boolean longLength) {
@@ -226,13 +299,13 @@ public class Switches extends Activity{
         });
     }
 
-    public void createUPnPServiceandActionInformations(DeviceDisplay device_display){
+    public void createUPnPServiceandActionInformations(Device upnp_device){
 
         LinearLayout ll;
         ll = (LinearLayout) findViewById(R.id.LinearLayoutUPnPDeviceInformations);
         TextView tv;
 
-        for (Service services : device_display.getServices()){
+        for (Service services : upnp_device.getServices()){
 
             tv = new TextView(this);
             tv.setText("Service " + services.getServiceType().getType() + ":");
