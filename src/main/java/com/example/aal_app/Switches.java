@@ -149,8 +149,6 @@ public class Switches extends Activity{
                             ActionArgumentValue value = invocation.getOutput(action_argument.getName());
                             showToast("Received Value: " + value.getValue().toString(), false);
                         }
-                        assert invocation.getOutput().length == 0;
-                        showToast("Successfully called action!", false);
                     }
 
                     @Override
