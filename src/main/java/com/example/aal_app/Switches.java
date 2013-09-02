@@ -75,13 +75,17 @@ public class Switches extends Activity{
     }
 
     @Override protected void onDestroy(){
-        super.onDestroy();
         this.device_display = null;
         this.listAdapter    = null;
         this.device_display = null;
         this.upnp_device = null;
         this.upnpService = null;
         this.input_value = null;
+    }
+
+    @Override protected void onPause(){
+        super.onPause();
+        finish();
     }
 
 
