@@ -133,7 +133,7 @@ public class Switches extends Activity{
     }
 
 
-    protected void executeAction(AndroidUpnpService upnpService, Service service, Action action, ActionArgument action_argument, ArrayList input_value, boolean isInput){
+    protected void executeAction(AndroidUpnpService upnpService, Service service, final Action action, final ActionArgument action_argument, ArrayList input_value, boolean isInput){
 
         ActionInvocation setTargetInvocation =
                 new SetTargetActionInvocation(service, action, action_argument, input_value, isInput);
@@ -145,6 +145,10 @@ public class Switches extends Activity{
 
                     @Override
                     public void success(ActionInvocation invocation) {
+                        if (action.hasOutputArguments()) {
+                            ActionArgumentValue value = invocation.getOutput(action_argument.getName());
+                            showToast("Received Value: " + value.getValue().toString(), false);
+                        }
                         assert invocation.getOutput().length == 0;
                         showToast("Successfully called action!", false);
                     }

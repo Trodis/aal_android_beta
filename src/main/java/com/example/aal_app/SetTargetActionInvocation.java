@@ -38,10 +38,7 @@ class SetTargetActionInvocation extends ActionInvocation {
         } else {
             try{
                 //setOutput(action_argument.getName(), null);
-                ActionArgumentValue value = getOutput(action_argument.getName());
-                if (value != null){
-                    Log.v("LOG LOG::::", value.getValue().toString());
-                }
+                setOutput(action_argument.getName(), false);
 
             } catch (InvalidValueException ex){
                 System.err.println(ex.getMessage());

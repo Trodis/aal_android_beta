@@ -60,12 +60,9 @@ public class SwitchPowerSubscriptionCallback extends SubscriptionCallback {
     public void eventReceived(GENASubscription sub) {
 
         Map<String, StateVariableValue> values = sub.getCurrentValues();
-        //StateVariableValue state_Variable_Value = values.get(action_argument.getRelatedStateVariableName());
         StateVariableValue state_Variable_Value = values.get(state_variable.getName());
-        Log.v("", "DEBUG DEBUG:::::::"+state_variable.getName());
 
         if (state_Variable_Value.getValue() != null){
-            Log.v("", "DEBUG DEBUG:::::::"+state_Variable_Value.getValue());
             if (state_Variable_Value.getDatatype().getBuiltin().equals(Datatype.Builtin.BOOLEAN )){
 
                 if((Boolean) state_Variable_Value.getValue()){
@@ -77,8 +74,6 @@ public class SwitchPowerSubscriptionCallback extends SubscriptionCallback {
 
             } else if (state_Variable_Value.getDatatype().getBuiltin().equals(Datatype.Builtin.UI1)){
                 Log.v("STRING STATEVARIABLE:::", ":::::"+state_Variable_Value.getValue() );
-
-
             }
 
         }
