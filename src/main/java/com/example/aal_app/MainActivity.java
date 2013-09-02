@@ -96,18 +96,18 @@ public class MainActivity extends ListActivity {
 
                 Service[] services_of_device = listAdapter.getItem(position).getDevice().getServices();
 
-                    if ( services_of_device != null ) {
+                if ( services_of_device != null ) {
 
-                        Intent intent = new Intent(MainActivity.this, Switches.class);
-                        intent.putExtra(EXTRA_MESSAGE, position);
-                        startActivity(intent);
+                    Intent intent = new Intent(MainActivity.this, Switches.class);
+                    intent.putExtra(EXTRA_MESSAGE, position);
+                    startActivity(intent);
 
-                    } else {
+                } else {
 
-                        Intent intent = new Intent(MainActivity.this, UPnPUnknownDevice.class);
-                        intent.putExtra(EXTRA_MESSAGE, position);
-                        startActivity(intent);
-                    }
+                    Intent intent = new Intent(MainActivity.this, UPnPUnknownDevice.class);
+                    intent.putExtra(EXTRA_MESSAGE, position);
+                    startActivity(intent);
+                }
 
                 showToast(listAdapter.getItem(position).getDeviceName() + " selected!", true);
             }
@@ -116,7 +116,6 @@ public class MainActivity extends ListActivity {
 
     @Override
     protected void onStart() {
-
         super.onStart();
         getApplicationContext().bindService(
                 new Intent(this, AndroidUpnpServiceImpl.class),
@@ -125,10 +124,8 @@ public class MainActivity extends ListActivity {
         );
     }
 
-
     @Override
-    protected void onDestroy() {
-
+    protected  void onDestroy(){
         super.onDestroy();
         if (upnpService != null) {
             upnpService.getRegistry().removeListener(registryListener);

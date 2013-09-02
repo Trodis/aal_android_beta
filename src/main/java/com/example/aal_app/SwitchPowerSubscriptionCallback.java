@@ -1,6 +1,7 @@
 package com.example.aal_app;
 
 import android.app.Activity;
+import android.renderscript.Element;
 import android.util.Log;
 import android.widget.Switch;
 import android.widget.Toast;
@@ -13,6 +14,7 @@ import org.teleal.cling.model.meta.ActionArgument;
 import org.teleal.cling.model.meta.Service;
 import org.teleal.cling.model.meta.StateVariable;
 import org.teleal.cling.model.state.StateVariableValue;
+import org.teleal.cling.model.types.Datatype;
 
 import java.util.Map;
 
@@ -28,10 +30,10 @@ public class SwitchPowerSubscriptionCallback extends SubscriptionCallback {
     public SwitchPowerSubscriptionCallback(Action action, StateVariable state_variable, Switches switches, int buttonID){
 
         super(action.getService(), 600);
-        this.action    = action;
-        this.switches   = switches;
+        this.action         = action;
+        this.switches       = switches;
         this.state_variable = state_variable;
-        this.buttonID = buttonID;
+        this.buttonID       = buttonID;
     }
 
     @Override
@@ -60,17 +62,25 @@ public class SwitchPowerSubscriptionCallback extends SubscriptionCallback {
         Map<String, StateVariableValue> values = sub.getCurrentValues();
         //StateVariableValue state_Variable_Value = values.get(action_argument.getRelatedStateVariableName());
         StateVariableValue state_Variable_Value = values.get(state_variable.getName());
-        //gena_service_received_state_status = state_Variable_Value.toString();
+        Log.v("", "DEBUG DEBUG:::::::"+state_variable.getName());
 
-        //Log.v("SubscriptionCallback LOG:", state_Variable_Value.toString());
+        if (state_Variable_Value.getValue() != null){
+            Log.v("", "DEBUG DEBUG:::::::"+state_Variable_Value.getValue());
+            if (state_Variable_Value.getDatatype().getBuiltin().equals(Datatype.Builtin.BOOLEAN)){
 
-        if ( state_Variable_Value != null){
+                if((Boolean) state_Variable_Value.getValue()){
+                    switches.setSwitch(true, buttonID);
+                } else {
+                    switches.setSwitch(false, buttonID);
+                }
 
-            if((Boolean) state_Variable_Value.getValue()){
-                switches.setSwitch(true, buttonID);
-            } else {
-                switches.setSwitch(false, buttonID);
+
+            } else if (state_Variable_Value.getDatatype().getBuiltin().equals(Datatype.Builtin.UI1)){
+                Log.v("STRING STATEVARIABLE:::", ":::::"+state_Variable_Value.getValue() );
+
+
             }
+
         }
     }
 

@@ -1,10 +1,16 @@
 package com.example.aal_app;
 
+import org.teleal.cling.model.action.ActionArgumentValue;
 import org.teleal.cling.model.action.ActionInvocation;
 import org.teleal.cling.model.meta.Action;
 import org.teleal.cling.model.meta.ActionArgument;
 import org.teleal.cling.model.meta.Service;
+import org.teleal.cling.model.types.Datatype;
 import org.teleal.cling.model.types.InvalidValueException;
+import org.teleal.cling.model.types.UnsignedIntegerOneByteDatatype;
+
+import java.util.ArrayList;
+
 /**
  * Created with IntelliJ IDEA.
  * User: trodis
@@ -16,13 +22,12 @@ import org.teleal.cling.model.types.InvalidValueException;
 
 class SetTargetActionInvocation extends ActionInvocation {
 
-    SetTargetActionInvocation(Service service, Action action, ActionArgument action_argument, boolean switch_status) {
+    SetTargetActionInvocation(Service service, Action action, ActionArgument action_argument, ArrayList input_value) {
+
         super(action);
+
         try {
-
-            // Throws InvalidValueException if the value is of wrong type
-            setInput(action_argument.getName(), switch_status);
-
+            setInput(action_argument.getName(), input_value.get(0) );
 
         } catch (InvalidValueException ex) {
             System.err.println(ex.getMessage());
