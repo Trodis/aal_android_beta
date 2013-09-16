@@ -23,10 +23,11 @@
                     android:typeface = "normal"
                     android:textSize = "18dp"
                     android:text = "Device Input Actions"
-                    android:gravity = "center"/>
+                    android:gravity = "center" />
+
         </LinearLayout>
 
-   </ScrollView>
+    </ScrollView>
 
     <ScrollView
             android:layout_width="fill_parent"
@@ -68,15 +69,16 @@
 
             <TextView
                     android:id = "@+id/UPnPASeekbarElementsTitle"
-                    android:layout_width = "match_parent"
+                    android:layout_width = "wrap_content"
                     android:layout_height = "wrap_content"
                     android:layout_marginTop="9dip"
                     android:layout_marginBottom="9dip"
+                    android:padding="10dp"
                     android:textStyle = "normal"
                     android:typeface = "normal"
                     android:textSize = "18dp"
-                    android:text = "Seekbar Actions"
-                    android:gravity = "center"/>
+                    android:text = "Seekbar Actions"/>
+
         </LinearLayout>
 
     </ScrollView>
