@@ -23,7 +23,9 @@ import java.util.ArrayList;
 
 class SetTargetActionInvocation extends ActionInvocation {
 
-    SetTargetActionInvocation(Service service, Action action, ActionArgument action_argument, ArrayList input_value, boolean isInput) {
+    SetTargetActionInvocation(Service service, Action action,
+                              ActionArgument action_argument,
+                              ArrayList input_value, boolean isInput) {
 
         super(action);
 

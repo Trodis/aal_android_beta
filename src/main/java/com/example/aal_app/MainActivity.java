@@ -38,26 +38,24 @@ import java.util.Map;
 public class MainActivity extends ListActivity {
 
     public final static String EXTRA_MESSAGE = "UPNP Device";
-
-    // private static final Logger log = Logger.getLogger(BrowseActivity.class.getName());
-
     public static ArrayAdapter<DeviceDisplay> listAdapter;
-
     private ListView list;
+    private BrowseRegistryListener registryListener = new
+            BrowseRegistryListener();
 
-    private BrowseRegistryListener registryListener = new BrowseRegistryListener();
+    private AndroidUpnpService upnpService;
 
-    public static AndroidUpnpService upnpService;
+    private ServiceConnection serviceConnection = new ServiceConnection()
+    {
 
-    private ServiceConnection serviceConnection = new ServiceConnection() {
-
-        public void onServiceConnected(ComponentName className, IBinder service) {
-
+        public void onServiceConnected(ComponentName className, IBinder service)
+        {
             upnpService = (AndroidUpnpService) service;
 
             // Refresh the list with all known devices
             listAdapter.clear();
-            for (Device device : upnpService.getRegistry().getDevices()) {
+            for (Device device : upnpService.getRegistry().getDevices())
+            {
                 registryListener.deviceAdded(device);
             }
 
@@ -68,16 +66,15 @@ public class MainActivity extends ListActivity {
             upnpService.getControlPoint().search();
         }
 
-        public void onServiceDisconnected(ComponentName className) {
-
+        public void onServiceDisconnected(ComponentName className)
+        {
             upnpService = null;
         }
     };
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-
-
+    public void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
 
         listAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1);
@@ -85,25 +82,26 @@ public class MainActivity extends ListActivity {
 
         list = getListView();
 
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id)
+            {
+                String unique_device_identifier = listAdapter.getItem
+                        (position).getDevice().getIdentity().getUdn()
+                        .getIdentifierString();
 
-
-                //To change body of implemented methods use File | Settings | File Templates.
-                //final String item = parent.getItemAtPosition(position).toString();
-
-                String unique_device_identifier = listAdapter.getItem(position).getDevice().getIdentity().getUdn().getIdentifierString();
-
-                if (listAdapter.getItem(position).getDevice().isRoot()){
-
+                if (listAdapter.getItem(position).getDevice().isRoot())
+                {
                     Intent intent = new Intent(MainActivity.this, Switches.class);
                     intent.putExtra(EXTRA_MESSAGE, unique_device_identifier);
                     startActivity(intent);
-                    showToast(listAdapter.getItem(position).getDeviceName() + " selected!", true);
-
-                } else {
+                    showToast(listAdapter.getItem(position).getDeviceName()
+                              + " selected!", true);
+                }
+                else
+                {
                     showToast("This UPnP Device is not a root device!!!", true);
                 }
             }
@@ -111,7 +109,8 @@ public class MainActivity extends ListActivity {
     }
 
     @Override
-    protected void onStart() {
+    protected void onStart()
+    {
         super.onStart();
         getApplicationContext().bindService(
                 new Intent(this, AndroidUpnpServiceImpl.class),
@@ -121,53 +120,64 @@ public class MainActivity extends ListActivity {
     }
 
     @Override
-    protected  void onDestroy(){
+    protected  void onDestroy()
+    {
         super.onDestroy();
-        if (upnpService != null) {
+        if (upnpService != null)
+        {
             upnpService.getRegistry().removeListener(registryListener);
         }
-
         getApplicationContext().unbindService(serviceConnection);
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
         menu.add(0, 0, 0, R.string.search_lan);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()){
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
             case 0:
                 searchNetwork();
                 break;
         }
-
         return false;
     }
 
-    protected void searchNetwork() {
+    protected void searchNetwork()
+    {
+        if (upnpService == null)
+        {
+            return;
+        }
 
-        if (upnpService == null) return;
         Toast.makeText(this, R.string.search_lan, Toast.LENGTH_SHORT).show();
         upnpService.getRegistry().removeAllRemoteDevices();
         upnpService.getControlPoint().search();
     }
 
-    protected class BrowseRegistryListener extends DefaultRegistryListener {
+    protected class BrowseRegistryListener extends DefaultRegistryListener
+    {
 
         /* Discovery performance optimization for very slow Android devices! */
 
         @Override
-        public void remoteDeviceDiscoveryStarted(Registry registry, RemoteDevice device) {
+        public void remoteDeviceDiscoveryStarted(Registry registry,
+                                                 RemoteDevice device)
+        {
             deviceAdded(device);
         }
 
         @Override
-        public void remoteDeviceDiscoveryFailed(Registry registry, final RemoteDevice device, final Exception ex) {
+        public void remoteDeviceDiscoveryFailed(Registry registry,
+                                                final RemoteDevice device,
+                                                final Exception ex)
+        {
 
             showToast(
                     "Discovery failed of '" + device.getDisplayString() + "': " +
@@ -179,55 +189,67 @@ public class MainActivity extends ListActivity {
         /* End of optimization, you can remove the whole block if your Android handset is fast (>= 600 Mhz) */
 
         @Override
-        public void remoteDeviceAdded(Registry registry, RemoteDevice device) {
+        public void remoteDeviceAdded(Registry registry, RemoteDevice device)
+        {
 
             deviceAdded(device);
         }
 
         @Override
-        public void remoteDeviceRemoved(Registry registry, RemoteDevice device) {
+        public void remoteDeviceRemoved(Registry registry, RemoteDevice device)
+        {
 
             deviceRemoved(device);
         }
 
         @Override
-        public void localDeviceAdded(Registry registry, LocalDevice device) {
+        public void localDeviceAdded(Registry registry, LocalDevice device)
+        {
 
             deviceAdded(device);
         }
 
         @Override
-        public void localDeviceRemoved(Registry registry, LocalDevice device) {
+        public void localDeviceRemoved(Registry registry, LocalDevice device)
+        {
 
             deviceRemoved(device);
         }
 
-        public void deviceAdded(final Device device) {
+        public void deviceAdded(final Device device)
+        {
 
-            runOnUiThread(new Runnable() {
-                public void run() {
+            runOnUiThread(new Runnable()
+            {
+                public void run()
+                {
                     DeviceDisplay d = new DeviceDisplay(device);
 
                     int position = listAdapter.getPosition(d);
-                    if (position >= 0) {
+                    if (position >= 0)
+                    {
                         // Device already in the list, re-set new value at same position
                         listAdapter.remove(d);
                         listAdapter.insert(d, position);
-                    } else {
+                    }
+                    else
+                    {
                         listAdapter.add(d);
                     }
 
-                    // Sort it?
-                    // listAdapter.sort(DISPLAY_COMPARATOR);
-                    // listAdapter.notifyDataSetChanged();
+                    listAdapter.sort(DISPLAY_COMPARATOR);
+                    listAdapter.notifyDataSetChanged();
                 }
             });
         }
 
-        public void deviceRemoved(final Device device) {
+        public void deviceRemoved(final Device device)
+        {
 
-            runOnUiThread(new Runnable() {
-                public void run() {
+            runOnUiThread(new Runnable()
+            {
+                public void run()
+                {
                     listAdapter.remove(new DeviceDisplay(device));
                 }
             });
@@ -235,10 +257,12 @@ public class MainActivity extends ListActivity {
 
     }
 
-    protected void showToast(final String msg, final boolean longLength) {
-
-        runOnUiThread(new Runnable() {
-            public void run() {
+    protected void showToast(final String msg, final boolean longLength)
+    {
+        runOnUiThread(new Runnable()
+        {
+            public void run()
+            {
                 Toast.makeText(
                         MainActivity.this,
                         msg,
@@ -250,7 +274,8 @@ public class MainActivity extends ListActivity {
 
 
     static final Comparator<DeviceDisplay> DISPLAY_COMPARATOR =
-            new Comparator<DeviceDisplay>() {
+            new Comparator<DeviceDisplay>()
+            {
                 public int compare(DeviceDisplay a, DeviceDisplay b) {
                     return a.toString().compareTo(b.toString());
                 }

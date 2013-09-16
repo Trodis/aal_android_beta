@@ -25,19 +25,18 @@ public class SwitchPowerSubscriptionCallback extends SubscriptionCallback {
     ActionArgument action_argument;
     Action action;
     StateVariable state_variable;
-    int buttonID;
 
     public SwitchPowerSubscriptionCallback(Action action, StateVariable state_variable, Switches switches){
 
         super(action.getService(), 600);
         this.action         = action;
         this.switches       = switches;
-        this.state_variable = state_variable;
-        this.buttonID       = buttonID;
+        this.state_variable = state_variable;;
     }
 
     @Override
-    public void established(GENASubscription sub) {
+    public void established(GENASubscription sub)
+    {
         showToast("Subscription with Service established! Listening for Events, renewing in seconds: "
                 + sub.getActualDurationSeconds(), true);
     }
@@ -46,14 +45,16 @@ public class SwitchPowerSubscriptionCallback extends SubscriptionCallback {
     protected void failed(GENASubscription subscription,
                           UpnpResponse responseStatus,
                           Exception exception,
-                          String defaultMsg) {
+                          String defaultMsg)
+    {
         showToast(defaultMsg, true);
     }
 
     @Override
     public void ended(GENASubscription sub,
                       CancelReason reason,
-                      UpnpResponse response) {
+                      UpnpResponse response)
+    {
         assert reason == null;
     }
 
@@ -62,29 +63,38 @@ public class SwitchPowerSubscriptionCallback extends SubscriptionCallback {
         Map<String, StateVariableValue> values = sub.getCurrentValues();
         StateVariableValue state_Variable_Value = values.get(state_variable.getName());
 
-        if (state_Variable_Value.getValue() != null){
-            if (state_Variable_Value.getDatatype().getBuiltin().equals(Datatype.Builtin.BOOLEAN )){
+        if (state_Variable_Value.getValue() != null)
+        {
+            if (state_Variable_Value.getDatatype().getBuiltin().equals
+                    (Datatype.Builtin.BOOLEAN ))
+            {
 
                 if((Boolean) state_Variable_Value.getValue()){
                     switches.setSwitch(true, action);
-                } else {
+                }
+                else
+                {
                     switches.setSwitch(false, action);
                 }
-
-
-            } else if (state_Variable_Value.getDatatype().getBuiltin().equals(Datatype.Builtin.UI1)){
-                Log.v("STRING STATEVARIABLE:::", ":::::"+state_Variable_Value.getValue() );
             }
+            else if (state_Variable_Value.getDatatype().getBuiltin().equals
+                    (Datatype.Builtin.UI1))
+            {
 
+                switches.setSeekBar(state_Variable_Value.getValue().toString(),
+                                    action);
+            }
         }
     }
 
-    public void eventsMissed(GENASubscription sub, int numberOfMissedEvents) {
+    public void eventsMissed(GENASubscription sub, int numberOfMissedEvents)
+    {
         showToast("Missed events: " + numberOfMissedEvents, false);
     }
 
 
-    protected void showToast(final String msg, final boolean longLength) {
+    protected void showToast(final String msg, final boolean longLength)
+    {
         switches.showToast(msg, longLength);
     }
 
