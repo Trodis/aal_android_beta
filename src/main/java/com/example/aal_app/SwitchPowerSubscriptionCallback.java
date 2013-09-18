@@ -1,10 +1,6 @@
 package com.example.aal_app;
 
-import android.app.Activity;
-import android.renderscript.Element;
-import android.util.Log;
-import android.widget.Switch;
-import android.widget.Toast;
+
 import org.teleal.cling.controlpoint.SubscriptionCallback;
 import org.teleal.cling.model.gena.CancelReason;
 import org.teleal.cling.model.gena.GENASubscription;
@@ -20,9 +16,7 @@ import java.util.Map;
 
 public class SwitchPowerSubscriptionCallback extends SubscriptionCallback {
 
-    Service service;
     Switches switches;
-    ActionArgument action_argument;
     Action action;
     StateVariable state_variable;
 
@@ -37,7 +31,8 @@ public class SwitchPowerSubscriptionCallback extends SubscriptionCallback {
     @Override
     public void established(GENASubscription sub)
     {
-        showToast("Subscription with Service established! Listening for Events, renewing in seconds: "
+        showToast("Subscription with Service established! Listening for " +
+                  "Events, renewing in seconds: "
                 + sub.getActualDurationSeconds(), true);
     }
 
@@ -55,21 +50,22 @@ public class SwitchPowerSubscriptionCallback extends SubscriptionCallback {
                       CancelReason reason,
                       UpnpResponse response)
     {
-        assert reason == null;
+        showToast("Subscription of " + action.getName() + "ended", false);
     }
 
     public void eventReceived(GENASubscription sub) {
 
         Map<String, StateVariableValue> values = sub.getCurrentValues();
-        StateVariableValue state_Variable_Value = values.get(state_variable.getName());
+        StateVariableValue state_Variable_Value = values
+                .get(state_variable.getName());
 
         if (state_Variable_Value.getValue() != null)
         {
             if (state_Variable_Value.getDatatype().getBuiltin().equals
                     (Datatype.Builtin.BOOLEAN ))
             {
-
-                if((Boolean) state_Variable_Value.getValue()){
+                if((Boolean) state_Variable_Value.getValue())
+                {
                     switches.setSwitch(true, action);
                 }
                 else
@@ -80,9 +76,8 @@ public class SwitchPowerSubscriptionCallback extends SubscriptionCallback {
             else if (state_Variable_Value.getDatatype().getBuiltin().equals
                     (Datatype.Builtin.UI1))
             {
-
                 switches.setSeekBar(state_Variable_Value.getValue().toString(),
-                                    action);
+                    action);
             }
         }
     }

@@ -93,7 +93,6 @@ public class Switches extends Activity{
 
         if (this.upnp_device != null)
         {
-            createUPnPServiceandActionInformations(upnp_device);
             for (Service service : upnp_device.getServices())
             {
                 for(Action action : service.getActions())
@@ -101,6 +100,7 @@ public class Switches extends Activity{
                     generateUI(service, action);
                 }
             }
+            createUPnPServiceandActionInformations(upnp_device);
         }
         else
         {
@@ -153,7 +153,7 @@ public class Switches extends Activity{
     {
 
         ActionInvocation setTargetInvocation = new SetTargetActionInvocation
-                (service, action, action_argument,  input_value, isInput);
+                (service, action, action_argument, input_value, isInput);
 
         // Executes asynchronous in the background
         upnpService.getControlPoint().execute
@@ -186,12 +186,15 @@ public class Switches extends Activity{
                                     final ActionArgument action_argument)
     {
         LinearLayout ll = (LinearLayout) findViewById(R.id
-                .LinearLayoutUPnPActionElements);
+                .LinearLayoutInputActionElements);
 
-        Switch button = new Switch(this);
-        button.setText(action.getName());
-        button.setTag(action.getName());
-        button.setOnCheckedChangeListener(new CompoundButton
+        TextView tv = (TextView) (findViewById( R.id.InputActionTitle ));
+        tv.setText( "Input Action" );
+
+        Switch sw = new Switch(this);
+        sw.setText(action.getName());
+        sw.setTag(action.getName());
+        sw.setOnCheckedChangeListener(new CompoundButton
                 .OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView,
@@ -213,14 +216,16 @@ public class Switches extends Activity{
                 }
             }
         });
-        ll.addView(button);
+        ll.addView(sw);
     }
 
     public void createOutPutActions( final Action action,
                                      final ActionArgument action_argument)
     {
         LinearLayout ll = (LinearLayout) findViewById(R.id
-                .LinearLayoutUPnPOutputActionElements);
+                .LinearLayoutOutPutActionElements);
+        TextView tv = (TextView) findViewById( R.id.OutPutActionTitle );
+        tv.setText( "Output Actions" );
 
         Button button = new Button(this);
         button.setText(action.getName());
@@ -232,7 +237,6 @@ public class Switches extends Activity{
                         action_argument, input_value, false);
             }
         });
-
         ll.addView(button);
     }
 
@@ -245,7 +249,10 @@ public class Switches extends Activity{
                 .getAllowedValueRange().getMaximum();
 
         final LinearLayout ll;
-        ll = (LinearLayout) findViewById(R.id.LinearLayoutUPnPSeekBar);
+        ll = (LinearLayout) findViewById(R.id.LinearLayoutSeekBarElements);
+
+        TextView titlev = (TextView) (findViewById( R.id.SeekBarActionTitle ));
+        titlev.setText( "Seekbar Actions" );
 
         SeekBar sb = new SeekBar(this);
         sb.setTag(action.getName());
@@ -305,7 +312,7 @@ public class Switches extends Activity{
             public void run()
             {
                 final View ll = findViewById(R.id
-                        .LinearLayoutUPnPActionElements);
+                        .LinearLayoutActionElements);
 
                 Switch mySwitch;
                 mySwitch = (Switch) ll.findViewWithTag(action.getName());
@@ -320,7 +327,7 @@ public class Switches extends Activity{
         {
             public void run()
             {
-                final View ll = findViewById(R.id.LinearLayoutUPnPSeekBar);
+                final View ll = findViewById(R.id.LinearLayoutActionElements);
 
                 SeekBar sb;
                 sb = (SeekBar) ll.findViewWithTag( action.getName() );
@@ -335,7 +342,7 @@ public class Switches extends Activity{
         {
             public void run()
             {
-                final View ll = findViewById(R.id.LinearLayoutUPnPSeekBar);
+                final View ll = findViewById(R.id.LinearLayoutActionElements);
 
                 SeekBar sb;
                 sb = (SeekBar) ll.findViewWithTag( action.getName() );
@@ -411,7 +418,7 @@ public class Switches extends Activity{
     {
 
         LinearLayout ll;
-        ll = (LinearLayout) findViewById(R.id.LinearLayoutUPnPDeviceInformations);
+        ll = (LinearLayout) findViewById(R.id.LinearLayoutDeviceInformation);
         TextView tv;
 
         for (Service services : upnp_device.getServices())
@@ -421,14 +428,17 @@ public class Switches extends Activity{
             tv.setHighlightColor(1);
             tv.setTextColor(Color.rgb(50, 205, 50));
             tv.setTextSize(17);
-            ll.addView(tv);
+            LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+            ll.addView(tv, p);
 
             for(Action actions : services.getActions())
             {
                 tv = new TextView(this);
                 tv.setText(actions.getName());
-                tv.setTextSize(15);
-                ll.addView(tv);
+                tv.setTextSize( 15 );
+                ll.addView(tv, p);
             }
         }
     }
@@ -436,7 +446,7 @@ public class Switches extends Activity{
     public void createUPnPGeneralInformations(Service service)
     {
         LinearLayout ll;
-        ll = (LinearLayout) findViewById(R.id.LinearLayoutUPnPDeviceInformations);
+        ll = (LinearLayout) findViewById(R.id.LinearLayoutActionElements);
 
         TextView tv;
 
