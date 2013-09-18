@@ -17,6 +17,17 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
+        <repository>
+            <id>sonatype-oss-public</id>
+            <url>https://oss.sonatype.org/content/groups/public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+
     </repositories>
 
     <dependencies>
@@ -30,6 +41,11 @@
             <artifactId>robolectric</artifactId>
             <version>1.2</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.androidplot</groupId>
+            <artifactId>androidplot-core</artifactId>
+            <version>0.6.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -49,7 +65,7 @@
                 <version>3.5.1</version>
                 <configuration>
                     <sdk>
-                        <platform>8</platform>
+                        <platform>10</platform>
                     </sdk>
                 </configuration>
                 <extensions>true</extensions>
