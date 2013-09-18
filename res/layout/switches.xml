@@ -1,114 +1,159 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-    <ScrollView
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:orientation="vertical">
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:orientation="horizontal">
 
-        <LinearLayout
-            android:id = "@+id/LinearLayoutUPnPActionElements"
-            android:layout_height = "wrap_content"
-            android:layout_width = "match_parent"
-            android:orientation="vertical">
-
-            <TextView
-                    android:id = "@+id/UPnPActionElementsTitle"
-                    android:layout_width = "match_parent"
-                    android:layout_height = "wrap_content"
-                    android:layout_marginTop="9dip"
-                    android:layout_marginBottom="9dip"
-                    android:textStyle = "normal"
-                    android:typeface = "normal"
-                    android:textSize = "18dp"
-                    android:text = "Device Input Actions"
-                    android:gravity = "center" />
-
-        </LinearLayout>
-
-    </ScrollView>
 
     <ScrollView
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
             android:layout_height="fill_parent"
-            android:orientation="vertical">
+            android:id="@+id/scrollView"
+            android:layout_gravity="center"
+            android:padding="10dp" android:visibility="visible">
 
         <LinearLayout
-                android:id = "@+id/LinearLayoutUPnPOutputActionElements"
+                android:id = "@+id/LinearLayoutActionElements"
                 android:layout_height = "wrap_content"
-                android:layout_width = "match_parent"
+                android:layout_width = "fill_parent"
                 android:orientation="vertical">
 
-            <TextView
-                    android:id = "@+id/UPnPActionElementsTitle"
-                    android:layout_width = "match_parent"
+            <LinearLayout
+                    android:id = "@+id/LinearLayoutInputActionElements"
                     android:layout_height = "wrap_content"
-                    android:layout_marginTop="9dip"
-                    android:layout_marginBottom="9dip"
-                    android:textStyle = "normal"
+                    android:layout_width = "fill_parent"
+                    android:orientation="vertical"
+                    android:layout_gravity="center">
+
+                <TextView
+                    android:id = "@+id/InputActionTitle"
+                    android:text="No Input Actions found!"
+                    android:layout_height="wrap_content"
+                    android:layout_width="fill_parent"
+                    android:textStyle = "bold|normal"
                     android:typeface = "normal"
                     android:textSize = "18dp"
-                    android:text = "Device OutPut Actions"
-                    android:gravity = "center"/>
+                    android:layout_marginBottom="9dp"
+                    android:layout_marginTop="9dp"
+                    android:textColor="#eeeeee"
+                    android:layout_gravity="center"/>
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                    android:id = "@+id/LinearLayoutOutPutActionElements"
+                    android:layout_height = "wrap_content"
+                    android:layout_width = "fill_parent"
+                    android:orientation="vertical"
+                    android:layout_gravity="center_horizontal"
+                    >
+
+                <TextView
+                        android:id="@+id/OutPutActionTitle"
+                        android:text="No Output Actions found!"
+                        android:layout_height="wrap_content"
+                        android:layout_width="fill_parent"
+                        android:textStyle = "bold|normal"
+                        android:typeface = "normal"
+                        android:textSize = "18dp"
+                        android:layout_gravity="center"
+                        android:layout_marginBottom="9dp"
+                        android:layout_marginTop="9dp"
+                        android:textColor="#eeeeee"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                    android:id = "@+id/LinearLayoutSeekBarElements"
+                    android:layout_height = "wrap_content"
+                    android:layout_width = "fill_parent"
+                    android:orientation="vertical"
+                    android:layout_gravity="center_horizontal">
+
+                <TextView
+                        android:id = "@+id/SeekBarActionTitle"
+                        android:text="No Seekbar Actions found!"
+                        android:layout_height="wrap_content"
+                        android:layout_width="fill_parent"
+                        android:textStyle = "bold|normal"
+                        android:typeface = "normal"
+                        android:textSize = "18dp"
+                        android:layout_gravity="center"
+                        android:layout_marginBottom="9dp"
+                        android:layout_marginTop="9dp"
+                        android:textColor="#eeeeee"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                    android:id = "@+id/LinearLayoutDeviceInformation"
+                    android:layout_height = "fill_parent"
+                    android:layout_width = "fill_parent"
+                    android:orientation="vertical"
+                    android:layout_gravity="center_horizontal">
+
+                <TextView
+                        android:text="Device Informations"
+                        android:layout_height="wrap_content"
+                        android:layout_width="fill_parent"
+                        android:textStyle = "bold|normal"
+                        android:typeface = "normal"
+                        android:textSize = "18dp"
+                        android:layout_gravity="center"
+                        android:layout_marginBottom="9dp"
+                        android:layout_marginTop="9dp"
+                        android:textColor="#eeeeee"
+                        android:singleLine="true"/>
+
+            </LinearLayout>
+
 
         </LinearLayout>
 
     </ScrollView>
 
-    <ScrollView
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:orientation="vertical">
-
         <LinearLayout
-                android:id = "@+id/LinearLayoutUPnPSeekBar"
+                android:id = "@+id/LinearLayoutDiagramm"
                 android:layout_height = "wrap_content"
-                android:layout_width = "match_parent"
-                android:orientation="vertical">
+                android:layout_width = "fill_parent"
+                android:orientation="vertical"
+                android:layout_margin="25dp" android:layout_weight="0">
 
             <TextView
-                    android:id = "@+id/UPnPASeekbarElementsTitle"
-                    android:layout_width = "wrap_content"
-                    android:layout_height = "wrap_content"
-                    android:layout_marginTop="9dip"
-                    android:layout_marginBottom="9dip"
-                    android:padding="10dp"
+                    android:text="Ereignis Diagramm"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
                     android:textStyle = "normal"
                     android:typeface = "normal"
                     android:textSize = "18dp"
-                    android:text = "Seekbar Actions"/>
+                    android:layout_gravity="center_horizontal"/>
+
+            <com.androidplot.xy.XYPlot
+                android:id = "@+id/testPlot"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                androidPlot.title="A Simple XY Plot"
+                androidPlot.domainLabel="24h"
+                androidPlot.rangeLabel="Aktivität"
+                androidPlot.titleWidget.labelPaint.textSize="@dimen/title_font_size"
+                androidPlot.domainLabelWidget.labelPaint.textSize="@dimen/domain_label_font_size"
+                androidPlot.rangeLabelWidget.labelPaint.textSize="@dimen/range_label_font_size"
+                androidPlot.graphWidget.marginTop="20dp"
+                androidPlot.graphWidget.marginLeft="15dp"
+                androidPlot.graphWidget.marginBottom="25dp"
+                androidPlot.graphWidget.marginRight="10dp"
+                androidPlot.graphWidget.rangeLabelPaint.textSize="@dimen/range_tick_label_font_size"
+                androidPlot.graphWidget.rangeOriginLabelPaint.textSize="@dimen/range_tick_label_font_size"
+                androidPlot.graphWidget.domainLabelPaint.textSize="@dimen/domain_tick_label_font_size"
+                androidPlot.graphWidget.domainOriginLabelPaint.textSize="@dimen/domain_tick_label_font_size"
+                androidPlot.legendWidget.textPaint.textSize="@dimen/legend_text_font_size"
+                androidPlot.legendWidget.iconSizeMetrics.heightMetric.value="15dp"
+                androidPlot.legendWidget.iconSizeMetrics.widthMetric.value="15dp"
+                androidPlot.legendWidget.heightMetric.value="25dp"
+                androidPlot.legendWidget.positionMetrics.anchor="right_bottom"
+                androidPlot.graphWidget.gridLinePaint.color="#000000"/>
 
         </LinearLayout>
-
-    </ScrollView>
-
-    <ScrollView
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="vertical">
-
-        <LinearLayout
-            android:id = "@+id/LinearLayoutUPnPDeviceInformations"
-            android:layout_height = "wrap_content"
-            android:layout_width = "match_parent"
-            android:orientation="vertical">
-
-            <TextView
-                    android:id = "@+id/UPnPDeviceInformationTitle"
-                    android:layout_width = "match_parent"
-                    android:layout_height = "wrap_content"
-                    android:layout_marginTop="9dip"
-                    android:layout_marginBottom="9dip"
-                    android:textStyle = "normal"
-                    android:typeface = "normal"
-                    android:textSize = "18dp"
-                    android:text = "UPnP Geräte Informationen"
-                    android:gravity = "center"/>
-
-
-        </LinearLayout>
-
-    </ScrollView>
 
 </LinearLayout>
+
