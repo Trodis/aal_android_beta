@@ -1,6 +1,8 @@
 package com.example.aal_app;
 
 
+import android.text.format.Time;
+import android.util.Log;
 import org.teleal.cling.controlpoint.SubscriptionCallback;
 import org.teleal.cling.model.gena.CancelReason;
 import org.teleal.cling.model.gena.GENASubscription;
@@ -12,13 +14,17 @@ import org.teleal.cling.model.meta.StateVariable;
 import org.teleal.cling.model.state.StateVariableValue;
 import org.teleal.cling.model.types.Datatype;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Map;
+import java.util.TimeZone;
 
 public class SwitchPowerSubscriptionCallback extends SubscriptionCallback {
 
     Switches switches;
     Action action;
     StateVariable state_variable;
+    int counter = 0;
 
     public SwitchPowerSubscriptionCallback(Action action, StateVariable state_variable, Switches switches){
 
@@ -34,6 +40,7 @@ public class SwitchPowerSubscriptionCallback extends SubscriptionCallback {
         showToast("Subscription with Service established! Listening for " +
                   "Events, renewing in seconds: "
                 + sub.getActualDurationSeconds(), true);
+        this.counter = 0;
     }
 
     @Override
@@ -54,10 +61,17 @@ public class SwitchPowerSubscriptionCallback extends SubscriptionCallback {
     }
 
     public void eventReceived(GENASubscription sub) {
+        Number[] turnedOn = new Number[5];
+        Number[] time = new Number[5];
+        counter++;
+        Calendar calendar = Calendar.getInstance(
+                TimeZone.getTimeZone( "Europe/Berlin" ) );
+        Date currentDateAndTime = new Date();
+
 
         Map<String, StateVariableValue> values = sub.getCurrentValues();
         StateVariableValue state_Variable_Value = values
-                .get(state_variable.getName());
+                .get( state_variable.getName() );
 
         if (state_Variable_Value.getValue() != null)
         {
@@ -67,11 +81,28 @@ public class SwitchPowerSubscriptionCallback extends SubscriptionCallback {
                 if((Boolean) state_Variable_Value.getValue())
                 {
                     switches.setSwitch(true, action);
+                    if (counter < 5){
+                        turnedOn[counter] = 1;
+                        time[counter] = currentDateAndTime.getTime() / 1000L;
+                        Log.v( "LOG FROM SUBSCRIPTION",
+                               "" + currentDateAndTime );
+                    }
                 }
                 else
                 {
                     switches.setSwitch(false, action);
+                    if (counter < 5){
+                        turnedOn[counter] = 0;
+                        time[counter] = currentDateAndTime.getTime() / 1000L;
+                    }
                 }
+
+                if (counter == 5){
+                    switches.plotting(turnedOn, time);
+                    switches.redraw();
+                    counter = 0;
+                }
+
             }
             else if (state_Variable_Value.getDatatype().getBuiltin().equals
                     (Datatype.Builtin.UI1))

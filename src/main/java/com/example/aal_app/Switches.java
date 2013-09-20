@@ -6,14 +6,16 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.graphics.Color;
+import android.graphics.*;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.*;
+import com.androidplot.Plot;
 import org.teleal.cling.android.AndroidUpnpService;
 import org.teleal.cling.android.AndroidUpnpServiceImpl;
 import org.teleal.cling.controlpoint.ActionCallback;
@@ -29,14 +31,45 @@ import org.teleal.cling.model.types.*;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
-import java.util.Map;
+import java.text.*;
+import java.util.*;
+
+import android.app.Activity;
+import android.graphics.Color;
+import android.os.Bundle;
+import com.androidplot.Plot;
+import com.androidplot.xy.*;
+
+import java.util.Observable;
+import java.util.Observer;
+
 
 
 /**
  * @author Ferhat Özmen
  */
+
+
+
+
 public class Switches extends Activity{
+
+    private class MyPlotUpdater implements Observer {
+        Plot plot;
+        public MyPlotUpdater(Plot plot) {
+            this.plot = plot;
+        }
+        @Override
+        public void update(Observable o, Object arg) {
+            plot.redraw();
+        }
+    }
+
+    private XYPlot mySimpleXYPlot;
+    private XYPlot staticPlot;
+    private MyPlotUpdater plotUpdater;
+    DynamicXYDatasource data;
+    private Thread myThread;
 
     //private Service service_from_upnp_device;
     private String EXTRA_MESSAGE = "UPNP Device";
@@ -79,11 +112,14 @@ public class Switches extends Activity{
         this.unique_device_identifier = extras.getString(EXTRA_MESSAGE);
         this.savedInstanceState = savedInstanceState;
         input_value = new ArrayList();
+
     }
 
     @Override
     protected void onResume()
     {
+        myThread = new Thread(data);
+        myThread.start();
         super.onResume();
         if (upnpService != null && savedInstanceState == null)
         {
@@ -142,6 +178,7 @@ public class Switches extends Activity{
     @Override
     protected void onPause()
     {
+        data.stopThread();
         super.onPause();
         onDestroy();
     }
@@ -193,29 +230,26 @@ public class Switches extends Activity{
 
         Switch sw = new Switch(this);
         sw.setText(action.getName());
-        sw.setTag(action.getName());
-        sw.setOnCheckedChangeListener(new CompoundButton
+        sw.setTag( action.getName() );
+        sw.setOnCheckedChangeListener( new CompoundButton
                 .OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView,
                                          boolean isChecked) {
 
-                if (isChecked)
-                {
-                    input_value.add(true);
-                    executeAction(upnpService, action.getService(), action,
-                            action_argument, input_value, true);
+                if ( isChecked ) {
+                    input_value.add( true );
+                    executeAction( upnpService, action.getService(), action,
+                                   action_argument, input_value, true );
                     input_value.clear();
-                }
-                else
-                {
-                    input_value.add(false);
-                    executeAction(upnpService, action.getService(), action,
-                            action_argument, input_value, true);
+                } else {
+                    input_value.add( false );
+                    executeAction( upnpService, action.getService(), action,
+                                   action_argument, input_value, true );
                     input_value.clear();
                 }
             }
-        });
+        } );
         ll.addView(sw);
     }
 
@@ -462,5 +496,75 @@ public class Switches extends Activity{
 
         ll.addView(tv);
     }
+
+    public void plotting(Number[] turnedOn, Number[] time){
+
+        mySimpleXYPlot = (XYPlot) findViewById( R.id.testPlot );
+        // create our series from our array of nums:
+        XYSeries series2 = new SimpleXYSeries(
+                Arrays.asList(time),
+                Arrays.asList(turnedOn),
+                "Sightings in USA");
+
+        // Create a formatter to use for drawing a series using LineAndPointRenderer:
+        LineAndPointFormatter series1Format = new LineAndPointFormatter(Color.rgb(0, 0, 200), null, Color.rgb(0, 0, 80), null);
+
+        // setup our line fill paint to be a slightly transparent gradient:
+        Paint lineFill = new Paint();
+        lineFill.setAlpha(200);
+        lineFill.setShader(new LinearGradient(0, 0, 0, 250, Color.WHITE, Color.GREEN, Shader.TileMode.MIRROR));
+
+        LineAndPointFormatter formatter  = new LineAndPointFormatter(Color.rgb(0, 0, 200), null, Color.rgb(0, 0, 80), null);
+        formatter.setFillPaint(lineFill);
+        mySimpleXYPlot.getGraphWidget().setPaddingRight(2);
+        mySimpleXYPlot.addSeries(series2, formatter);
+
+        // draw a domain tick for each year:
+        mySimpleXYPlot.setDomainStep(XYStepMode.SUBDIVIDE, time.length);
+
+        // customize our domain/range labels
+        mySimpleXYPlot.setDomainLabel("Year");
+        mySimpleXYPlot.setRangeLabel("# of Sightings");
+
+        // get rid of decimal points in our range labels:
+        mySimpleXYPlot.setRangeValueFormat(new DecimalFormat("0"));
+
+        mySimpleXYPlot.setDomainValueFormat(new Format() {
+
+            // create a simple date format that draws on the year portion of our timestamp.
+            // see http://download.oracle.com/javase/1.4.2/docs/api/java/text/SimpleDateFormat.html
+            // for a full description of SimpleDateFormat.
+            private SimpleDateFormat dateFormat = new SimpleDateFormat
+                    ("yyyy");
+
+            @Override
+            public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos) {
+
+                // because our timestamps are in seconds and SimpleDateFormat expects milliseconds
+                // we multiply our timestamp by 1000:
+                long timestamp = ((Number) obj).longValue() * 1000;
+                Date date = new Date(timestamp);
+                Log.v("LOG LOG", ""+date);
+                return dateFormat.format(date, toAppendTo, pos);
+            }
+
+            @Override
+            public Object parseObject(String source, ParsePosition pos) {
+                return null;
+            }
+        });
+
+
+
+        // by default, AndroidPlot displays developer guides to aid in laying out your plot.
+        // To get rid of them call disableAllMarkup():
+    }
+
+    public void redraw(){
+        mySimpleXYPlot.redraw();
+    }
+
+
+
 
 }
