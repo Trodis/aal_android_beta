@@ -14,24 +14,27 @@ import org.teleal.cling.model.meta.StateVariable;
 import org.teleal.cling.model.state.StateVariableValue;
 import org.teleal.cling.model.types.Datatype;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 
-public class SwitchPowerSubscriptionCallback extends SubscriptionCallback {
+public class SwitchPowerSubscriptionCallback extends SubscriptionCallback implements Runnable {
 
     Switches switches;
     Action action;
     StateVariable state_variable;
-    int counter = 0;
-
-    public SwitchPowerSubscriptionCallback(Action action, StateVariable state_variable, Switches switches){
+    int counter;
+    private long time;
+    private int turnedOn;
+    private DynamicSeries data;
+    public SwitchPowerSubscriptionCallback(Action action,
+                                           StateVariable state_variable,
+                                           Switches switches)
+    {
 
         super(action.getService(), 600);
         this.action         = action;
         this.switches       = switches;
-        this.state_variable = state_variable;;
+        this.state_variable = state_variable;
+        this.data = data;
     }
 
     @Override
@@ -40,7 +43,6 @@ public class SwitchPowerSubscriptionCallback extends SubscriptionCallback {
         showToast("Subscription with Service established! Listening for " +
                   "Events, renewing in seconds: "
                 + sub.getActualDurationSeconds(), true);
-        this.counter = 0;
     }
 
     @Override
@@ -61,14 +63,6 @@ public class SwitchPowerSubscriptionCallback extends SubscriptionCallback {
     }
 
     public void eventReceived(GENASubscription sub) {
-        Number[] turnedOn = new Number[5];
-        Number[] time = new Number[5];
-        counter++;
-        Calendar calendar = Calendar.getInstance(
-                TimeZone.getTimeZone( "Europe/Berlin" ) );
-        Date currentDateAndTime = new Date();
-
-
         Map<String, StateVariableValue> values = sub.getCurrentValues();
         StateVariableValue state_Variable_Value = values
                 .get( state_variable.getName() );
@@ -78,29 +72,14 @@ public class SwitchPowerSubscriptionCallback extends SubscriptionCallback {
             if (state_Variable_Value.getDatatype().getBuiltin().equals
                     (Datatype.Builtin.BOOLEAN ))
             {
+
                 if((Boolean) state_Variable_Value.getValue())
                 {
                     switches.setSwitch(true, action);
-                    if (counter < 5){
-                        turnedOn[counter] = 1;
-                        time[counter] = currentDateAndTime.getTime() / 1000L;
-                        Log.v( "LOG FROM SUBSCRIPTION",
-                               "" + currentDateAndTime );
-                    }
                 }
                 else
                 {
                     switches.setSwitch(false, action);
-                    if (counter < 5){
-                        turnedOn[counter] = 0;
-                        time[counter] = currentDateAndTime.getTime() / 1000L;
-                    }
-                }
-
-                if (counter == 5){
-                    switches.plotting(turnedOn, time);
-                    switches.redraw();
-                    counter = 0;
                 }
 
             }
@@ -123,5 +102,4 @@ public class SwitchPowerSubscriptionCallback extends SubscriptionCallback {
     {
         switches.showToast(msg, longLength);
     }
-
 }

@@ -16,33 +16,27 @@ public class DynamicXYDatasource implements Runnable {
         }
     }
 
-    private static final int MAX_AMP_SEED = 100;
-    private static final int MIN_AMP_SEED = 10;
-    private static final int AMP_STEP = 5;
+    private static final int MAX_AMP_SEED = 1;
+    private static final int MIN_AMP_SEED = 0;
+    private static final int AMP_STEP = 1;
     public static final int SINE1 = 0;
     public static final int SINE2 = 1;
     private static final int SAMPLE_SIZE = 30;
     private int phase = 0;
-    private int sinAmp = 20;
+    private int sinAmp = 0;
     private MyObservable notifier;
-    private boolean keepRunning = false;
 
     {
         notifier = new MyObservable();
     }
 
-    public void stopThread() {
-        keepRunning = false;
-    }
-
     //@Override
     public void run() {
         try {
-            keepRunning = true;
             boolean isRising = true;
-            while (keepRunning) {
+            while (true) {
 
-                Thread.sleep(50); // decrease or remove to speed up the refresh rate.
+                Thread.sleep(100); // decrease or remove to speed up the refresh rate.
                 phase++;
                 if (sinAmp >= MAX_AMP_SEED) {
                     isRising = false;
@@ -63,7 +57,7 @@ public class DynamicXYDatasource implements Runnable {
     }
 
     public int getItemCount(int series) {
-        return 30;
+        return 20;
     }
 
     public Number getX(int series, int index) {
@@ -77,7 +71,7 @@ public class DynamicXYDatasource implements Runnable {
         if (index >= SAMPLE_SIZE) {
             throw new IllegalArgumentException();
         }
-        double amp = sinAmp * Math.sin(index + phase + 4);
+        double amp = sinAmp;
         switch (series) {
             case SINE1:
                 return amp;

@@ -16,6 +16,13 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.*;
 import com.androidplot.Plot;
+import org.achartengine.ChartFactory;
+import org.achartengine.GraphicalView;
+import org.achartengine.chart.XYChart;
+import org.achartengine.model.*;
+import org.achartengine.model.XYSeries;
+import org.achartengine.renderer.*;
+import org.achartengine.renderer.XYSeriesRenderer;
 import org.teleal.cling.android.AndroidUpnpService;
 import org.teleal.cling.android.AndroidUpnpServiceImpl;
 import org.teleal.cling.controlpoint.ActionCallback;
@@ -44,11 +51,9 @@ import java.util.Observable;
 import java.util.Observer;
 
 
-
 /**
  * @author Ferhat Özmen
  */
-
 
 
 
@@ -83,6 +88,34 @@ public class Switches extends Activity{
     private SubscriptionCallback callback;
     private String unique_device_identifier;
     private Bundle savedInstanceState;
+    ArrayList numSightings = new ArrayList();
+    ArrayList years = new ArrayList();
+    SimpleXYSeries series2;
+
+    private GraphicalView mChart;
+    private XYMultipleSeriesDataset mDataSet = new XYMultipleSeriesDataset();
+    private XYMultipleSeriesRenderer mRenderer = new XYMultipleSeriesRenderer();
+
+    private org.achartengine.model.XYSeries mCurrentSeries;
+    private org.achartengine.renderer.XYSeriesRenderer mCurrentRenderer;
+
+    private void initChart(){
+        mCurrentSeries = new XYSeries("Sample Data");
+        mDataSet.addSeries(mCurrentSeries);
+        mCurrentRenderer = new XYSeriesRenderer();
+        mRenderer.addSeriesRenderer(mCurrentRenderer);
+        mRenderer.setPointSize(10);
+    }
+
+    private void addSampleData(){
+        mCurrentSeries.add(1, 2);
+        mCurrentSeries.add(2, 3);
+        mCurrentSeries.add(3, 2);
+        mCurrentSeries.add(4, 5);
+        mCurrentSeries.add(5, 4);
+
+    }
+
 
     private final static String seekbar_process_tag = "SeekBar Process";
 
@@ -112,14 +145,15 @@ public class Switches extends Activity{
         this.unique_device_identifier = extras.getString(EXTRA_MESSAGE);
         this.savedInstanceState = savedInstanceState;
         input_value = new ArrayList();
+        //plotting();
 
     }
 
     @Override
     protected void onResume()
     {
-        myThread = new Thread(data);
-        myThread.start();
+        //myThread = new Thread(data);
+        //myThread.start();
         super.onResume();
         if (upnpService != null && savedInstanceState == null)
         {
@@ -142,6 +176,16 @@ public class Switches extends Activity{
         {
             this.savedInstanceState = null;
             onCreate(savedInstanceState);
+        }
+
+        LinearLayout layout = (LinearLayout) findViewById(R.id.chart);
+        if(mChart == null){
+            initChart();
+            addSampleData();
+            mChart = ChartFactory.getCubeLineChartView(this, mDataSet, mRenderer, 0.3f);
+            layout.addView(mChart);
+        } else {
+            mChart.repaint();
         }
     }
 
@@ -178,7 +222,7 @@ public class Switches extends Activity{
     @Override
     protected void onPause()
     {
-        data.stopThread();
+        //data.stopThread();
         super.onPause();
         onDestroy();
     }
@@ -238,6 +282,7 @@ public class Switches extends Activity{
                                          boolean isChecked) {
 
                 if ( isChecked ) {
+                    //repaint();
                     input_value.add( true );
                     executeAction( upnpService, action.getService(), action,
                                    action_argument, input_value, true );
@@ -391,7 +436,9 @@ public class Switches extends Activity{
     {
             this.callback = new SwitchPowerSubscriptionCallback (action,
                             state_variable, this);
+
             upnpService.getControlPoint().execute(callback);
+
     }
 
     public void createSwitchPowerSubscription(Action action)
@@ -405,6 +452,7 @@ public class Switches extends Activity{
                 {
                     startEventlistening(action, state_variable);
                     Log.v(TAG, "STATEVARIABLE: " + state_variable);
+
                 }
             }
         }
@@ -497,74 +545,136 @@ public class Switches extends Activity{
         ll.addView(tv);
     }
 
-    public void plotting(Number[] turnedOn, Number[] time){
+    public void plotting(){
 
-        mySimpleXYPlot = (XYPlot) findViewById( R.id.testPlot );
+       // mySimpleXYPlot = (XYPlot) findViewById(R.id.testPlot);
+        Number[] numSightings = {1, 2, 3, 4, 5};
+        Number[] years =        {12, 22, 13, 54, 11};
+
         // create our series from our array of nums:
-        XYSeries series2 = new SimpleXYSeries(
-                Arrays.asList(time),
-                Arrays.asList(turnedOn),
+        /*this.series2 = new SimpleXYSeries(
+                Arrays.asList(years),
+                SimpleXYSeries.ArrayFormat.Y_VALS_ONLY,
                 "Sightings in USA");
+            */
+
+        DynamicSeries series2 = new DynamicSeries("Series");
+        mySimpleXYPlot.getGraphWidget().getGridBackgroundPaint().setColor(Color.WHITE);
+        mySimpleXYPlot.getGraphWidget().getDomainOriginLinePaint().setColor(Color.BLACK);
+        mySimpleXYPlot.getGraphWidget().getRangeOriginLinePaint().setColor(Color.BLACK);
+
+        mySimpleXYPlot.setBorderStyle(Plot.BorderStyle.SQUARE, null, null);
+        mySimpleXYPlot.getBorderPaint().setStrokeWidth(3);
+        mySimpleXYPlot.getBorderPaint().setAntiAlias(true);
+        mySimpleXYPlot.getBorderPaint().setColor(Color.WHITE);
 
         // Create a formatter to use for drawing a series using LineAndPointRenderer:
-        LineAndPointFormatter series1Format = new LineAndPointFormatter(Color.rgb(0, 0, 200), null, Color.rgb(0, 0, 80), null);
+        LineAndPointFormatter series1Format = new LineAndPointFormatter(
+                Color.rgb(0, 100, 0),                   // line color
+                Color.rgb(0, 100, 0),                   // point color
+                Color.rgb(100, 200, 0), null);          // fill color
 
         // setup our line fill paint to be a slightly transparent gradient:
         Paint lineFill = new Paint();
         lineFill.setAlpha(200);
         lineFill.setShader(new LinearGradient(0, 0, 0, 250, Color.WHITE, Color.GREEN, Shader.TileMode.MIRROR));
 
-        LineAndPointFormatter formatter  = new LineAndPointFormatter(Color.rgb(0, 0, 200), null, Color.rgb(0, 0, 80), null);
+        LineAndPointFormatter formatter  = new LineAndPointFormatter(Color.rgb(0, 0,0), Color.BLUE, Color.RED, null);
         formatter.setFillPaint(lineFill);
         mySimpleXYPlot.getGraphWidget().setPaddingRight(2);
         mySimpleXYPlot.addSeries(series2, formatter);
 
         // draw a domain tick for each year:
-        mySimpleXYPlot.setDomainStep(XYStepMode.SUBDIVIDE, time.length);
+        //mySimpleXYPlot.setDomainBoundaries(0, 24, BoundaryMode.FIXED);
+        //mySimpleXYPlot.setRangeBoundaries(0, 1, BoundaryMode.FIXED);
 
         // customize our domain/range labels
         mySimpleXYPlot.setDomainLabel("Year");
         mySimpleXYPlot.setRangeLabel("# of Sightings");
+        mySimpleXYPlot.setDomainStepMode(XYStepMode.SUBDIVIDE);
+        mySimpleXYPlot.setDomainStepValue(series2.size());
+        //mySimpleXYPlot.setDomainValueFormat(new DecimalFormat("0"));
+        //mySimpleXYPlot.setDomainStep(XYStepMode.SUBDIVIDE, series2.size());
+        //mySimpleXYPlot.setRangeStep(XYStepMode.SUBDIVIDE, series2.size());
+        mySimpleXYPlot.setRangeValueFormat(new DecimalFormat("0"));
+        //mySimpleXYPlot.setRangeStepMode(XYStepMode.SUBDIVIDE);
+        mySimpleXYPlot.setRangeBoundaries(0, 1, BoundaryMode.FIXED);
+
+        //mySimpleXYPlot.setR
 
         // get rid of decimal points in our range labels:
         mySimpleXYPlot.setRangeValueFormat(new DecimalFormat("0"));
 
-        mySimpleXYPlot.setDomainValueFormat(new Format() {
+      mySimpleXYPlot.setDomainValueFormat(new Format() {
 
             // create a simple date format that draws on the year portion of our timestamp.
             // see http://download.oracle.com/javase/1.4.2/docs/api/java/text/SimpleDateFormat.html
             // for a full description of SimpleDateFormat.
-            private SimpleDateFormat dateFormat = new SimpleDateFormat
-                    ("yyyy");
+            private SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
 
             @Override
             public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos) {
 
                 // because our timestamps are in seconds and SimpleDateFormat expects milliseconds
                 // we multiply our timestamp by 1000:
-                long timestamp = ((Number) obj).longValue() * 1000;
+                long timestamp = ((Number) obj).longValue();
                 Date date = new Date(timestamp);
-                Log.v("LOG LOG", ""+date);
                 return dateFormat.format(date, toAppendTo, pos);
             }
 
             @Override
             public Object parseObject(String source, ParsePosition pos) {
                 return null;
+
             }
         });
 
-
-
         // by default, AndroidPlot displays developer guides to aid in laying out your plot.
         // To get rid of them call disableAllMarkup():
+
     }
 
-    public void redraw(){
+    public void achart(){
+
+    }
+
+    public void repaint(){
+       /*
+        Number[] numSightings = {1,0,1,0,1};
+        ArrayList test = new ArrayList();
+        test.add(33);
+        test.add(42);
+        test.add(544);
+
+        series2.setModel(test, SimpleXYSeries.ArrayFormat.Y_VALS_ONLY);
+        series2.setXY(23,45, 0);
+         */
         mySimpleXYPlot.redraw();
     }
 
+    private class ANFormat extends Format {
+        @Override
+        public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos) {
+            Number num = (Number) obj;
 
+            // using num.intValue() will floor the value, so we add 0.5 to round instead:
+            int roundNum = (int) (num.floatValue() + 0.5f);
+            switch(roundNum) {
+                case 0:
+                    toAppendTo.append("Aus");
+                    break;
+                case 1:
+                    toAppendTo.append("An");
+                default:
+                    toAppendTo.append("Unknown");
+            }
+            return toAppendTo;
+        }
 
+        @Override
+        public Object parseObject(String source, ParsePosition pos) {
+            return null;  // We don't use this so just return null for now.
+        }
+    }
 
 }
