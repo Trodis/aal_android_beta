@@ -14,6 +14,7 @@ import org.teleal.cling.model.meta.StateVariable;
 import org.teleal.cling.model.state.StateVariableValue;
 import org.teleal.cling.model.types.Datatype;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class SwitchPowerSubscriptionCallback extends SubscriptionCallback implements Runnable {
@@ -21,7 +22,7 @@ public class SwitchPowerSubscriptionCallback extends SubscriptionCallback implem
     Switches switches;
     Action action;
     StateVariable state_variable;
-    int counter;
+    int counter = 0;
     private long time;
     private int turnedOn;
     private DynamicSeries data;
@@ -29,7 +30,6 @@ public class SwitchPowerSubscriptionCallback extends SubscriptionCallback implem
                                            StateVariable state_variable,
                                            Switches switches)
     {
-
         super(action.getService(), 600);
         this.action         = action;
         this.switches       = switches;
@@ -43,6 +43,7 @@ public class SwitchPowerSubscriptionCallback extends SubscriptionCallback implem
         showToast("Subscription with Service established! Listening for " +
                   "Events, renewing in seconds: "
                 + sub.getActualDurationSeconds(), true);
+
     }
 
     @Override
@@ -59,7 +60,7 @@ public class SwitchPowerSubscriptionCallback extends SubscriptionCallback implem
                       CancelReason reason,
                       UpnpResponse response)
     {
-        showToast("Subscription of " + action.getName() + "ended", false);
+        showToast( "Subscription of " + action.getName() + " ended", false );
     }
 
     public void eventReceived(GENASubscription sub) {
@@ -70,27 +71,39 @@ public class SwitchPowerSubscriptionCallback extends SubscriptionCallback implem
         if (state_Variable_Value.getValue() != null)
         {
             if (state_Variable_Value.getDatatype().getBuiltin().equals
-                    (Datatype.Builtin.BOOLEAN ))
+                    (Datatype.Builtin.BOOLEAN ) && action.hasInputArguments())
             {
-
                 if((Boolean) state_Variable_Value.getValue())
+
                 {
                     switches.setSwitch(true, action);
+                    switches.addnewPoint(counter, 1);
+
                 }
                 else
                 {
                     switches.setSwitch(false, action);
+                    switches.addnewPoint(counter, 0);
                 }
 
             }
             else if (state_Variable_Value.getDatatype().getBuiltin().equals
-                    (Datatype.Builtin.UI1))
+                    (Datatype.Builtin.UI1) && action.hasInputArguments())
             {
                 switches.setSeekBar(state_Variable_Value.getValue().toString(),
-                    action);
+                                    action);
             }
+            else if (state_Variable_Value.getDatatype().getBuiltin().equals(
+                    Datatype.Builtin.BOOLEAN ))
+            {
+                switches.addnewPoint(counter, Boolean
+                        .valueOf((Boolean)state_Variable_Value
+                                .getValue()).compareTo( false ));
+            }
+            counter++;
         }
     }
+
 
     public void eventsMissed(GENASubscription sub, int numberOfMissedEvents)
     {
