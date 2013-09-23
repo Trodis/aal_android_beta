@@ -1,40 +1,27 @@
 package com.example.aal_app;
 
-
-import android.text.format.Time;
-import android.util.Log;
 import org.teleal.cling.controlpoint.SubscriptionCallback;
 import org.teleal.cling.model.gena.CancelReason;
 import org.teleal.cling.model.gena.GENASubscription;
 import org.teleal.cling.model.message.UpnpResponse;
 import org.teleal.cling.model.meta.Action;
-import org.teleal.cling.model.meta.ActionArgument;
-import org.teleal.cling.model.meta.Service;
 import org.teleal.cling.model.meta.StateVariable;
 import org.teleal.cling.model.state.StateVariableValue;
 import org.teleal.cling.model.types.Datatype;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class SwitchPowerSubscriptionCallback extends SubscriptionCallback implements Runnable {
 
     Switches switches;
-    Action action;
     StateVariable state_variable;
     int counter = 0;
-    private long time;
-    private int turnedOn;
-    private DynamicSeries data;
-    public SwitchPowerSubscriptionCallback(Action action,
-                                           StateVariable state_variable,
+    public SwitchPowerSubscriptionCallback(StateVariable state_variable,
                                            Switches switches)
     {
-        super(action.getService(), 600);
-        this.action         = action;
+        super(state_variable.getService());
         this.switches       = switches;
         this.state_variable = state_variable;
-        this.data = data;
     }
 
     @Override
@@ -60,7 +47,7 @@ public class SwitchPowerSubscriptionCallback extends SubscriptionCallback implem
                       CancelReason reason,
                       UpnpResponse response)
     {
-        showToast( "Subscription of " + action.getName() + " ended", false );
+        showToast( "Subscription ended", false );
     }
 
     public void eventReceived(GENASubscription sub) {
@@ -70,35 +57,38 @@ public class SwitchPowerSubscriptionCallback extends SubscriptionCallback implem
 
         if (state_Variable_Value.getValue() != null)
         {
-            if (state_Variable_Value.getDatatype().getBuiltin().equals
-                    (Datatype.Builtin.BOOLEAN ) && action.hasInputArguments())
+            if (state_Variable_Value.getDatatype()
+                    .getBuiltin().equals( Datatype.Builtin.BOOLEAN ))
             {
-                if((Boolean) state_Variable_Value.getValue())
+                boolean received_value =
+                        (Boolean)state_Variable_Value.getValue();
 
+                switches.addnewPoint(counter,
+                                     Boolean.valueOf(received_value).compareTo(false));
+
+                for (Action action : state_variable.getService().getActions())
                 {
-                    switches.setSwitch(true, action);
-                    switches.addnewPoint(counter, 1);
-
+                    if (action.hasInputArguments())
+                    {
+                        switches.setSwitch(received_value, action);
+                    }
                 }
-                else
+            }
+            else if ( state_Variable_Value.getDatatype().getBuiltin()
+                        .equals( Datatype.Builtin.UI1))
+            {
+                switches.addnewPoint(counter,
+                        Integer.parseInt(state_Variable_Value.getValue()
+                            .toString()));
+
+                for (Action action : state_variable.getService().getActions())
                 {
-                    switches.setSwitch(false, action);
-                    switches.addnewPoint(counter, 0);
+                    if (action.hasInputArguments())
+                    {
+                        switches.setSeekBar(state_Variable_Value.getValue()
+                                                    .toString(), action);
+                    }
                 }
-
-            }
-            else if (state_Variable_Value.getDatatype().getBuiltin().equals
-                    (Datatype.Builtin.UI1) && action.hasInputArguments())
-            {
-                switches.setSeekBar(state_Variable_Value.getValue().toString(),
-                                    action);
-            }
-            else if (state_Variable_Value.getDatatype().getBuiltin().equals(
-                    Datatype.Builtin.BOOLEAN ))
-            {
-                switches.addnewPoint(counter, Boolean
-                        .valueOf((Boolean)state_Variable_Value
-                                .getValue()).compareTo( false ));
             }
             counter++;
         }

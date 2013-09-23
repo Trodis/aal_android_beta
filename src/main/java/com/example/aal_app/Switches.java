@@ -61,24 +61,6 @@ import java.util.Observer;
 
 public class Switches extends Activity{
 
-    private class MyPlotUpdater implements Observer {
-        Plot plot;
-        public MyPlotUpdater(Plot plot) {
-            this.plot = plot;
-        }
-        @Override
-        public void update(Observable o, Object arg) {
-            plot.redraw();
-        }
-    }
-
-    private XYPlot mySimpleXYPlot;
-    private XYPlot staticPlot;
-    private MyPlotUpdater plotUpdater;
-    DynamicXYDatasource data;
-    private Thread myThread;
-
-    //private Service service_from_upnp_device;
     private String EXTRA_MESSAGE = "UPNP Device";
     private static final String TAG = "AAL LOG: ";
 
@@ -90,9 +72,6 @@ public class Switches extends Activity{
     private SubscriptionCallback callback;
     private String unique_device_identifier;
     private Bundle savedInstanceState;
-    ArrayList numSightings = new ArrayList();
-    ArrayList years = new ArrayList();
-    SimpleXYSeries series2;
 
     private GraphicalView mChart;
     private XYMultipleSeriesDataset mDataSet = new XYMultipleSeriesDataset();
@@ -101,7 +80,8 @@ public class Switches extends Activity{
     private TimeSeries mCurrentSeries;
     private org.achartengine.renderer.XYSeriesRenderer mCurrentRenderer;
 
-    private void initChartBoolean(){
+    private void initChartBoolean()
+    {
         mCurrentSeries = new TimeSeries("Sample Data");
         mDataSet.addSeries(mCurrentSeries);
         mCurrentRenderer = new XYSeriesRenderer();
@@ -109,9 +89,9 @@ public class Switches extends Activity{
         mRenderer.setPointSize(3);
         //mRenderer.setLabelFormat( new DecimalFormat( "0" ) );
         mRenderer.setYTitle( "Ein und Ausschalt Zyklus" );
-        mRenderer.setYLabels( 2 );
-        mRenderer.addYTextLabel( 0, "Ausgeschaltet" );
-        mRenderer.addYTextLabel( 1, "Eingeschaltet" );
+        //mRenderer.setYLabels( 2 );
+        //mRenderer.addYTextLabel( 0, "Ausgeschaltet" );
+        //mRenderer.addYTextLabel( 1, "Eingeschaltet" );
         mRenderer.setYLabelsAlign( Paint.Align.LEFT );
         mRenderer.setYLabelsPadding( 2 );
         mRenderer.setLabelsTextSize( 15 );
@@ -121,7 +101,7 @@ public class Switches extends Activity{
         mCurrentRenderer.setFillPoints( true );
         // mCurrentRenderer.setDisplayChartValues(true);
         mCurrentRenderer.setColor( Color.WHITE );
-        mRenderer.setPanEnabled( true, false );
+        //mRenderer.setPanEnabled( true, true );
         mCurrentRenderer.setShowLegendItem( true );
         mCurrentRenderer.setAnnotationsTextAlign( Paint.Align.LEFT );
         mCurrentRenderer.setAnnotationsTextSize(15);
@@ -169,8 +149,6 @@ public class Switches extends Activity{
     @Override
     protected void onResume()
     {
-        //myThread = new Thread(data);
-        //myThread.start();
         super.onResume();
         if (upnpService != null && savedInstanceState == null)
         {
@@ -186,6 +164,7 @@ public class Switches extends Activity{
                 {
                     generateUI(service, action);
                 }
+                setSubscription(service);
             }
             createUPnPServiceandActionInformations(upnp_device);
         }
@@ -241,7 +220,6 @@ public class Switches extends Activity{
     @Override
     protected void onPause()
     {
-        //data.stopThread();
         super.onPause();
         onDestroy();
     }
@@ -338,7 +316,7 @@ public class Switches extends Activity{
     }
 
     public void createSeekBarActions(final Service service,
-                                     final  Action action,
+                                     final Action action,
                                      final ActionArgument action_argument)
     {
         int max_range = (int) service.getStateVariable( action_argument
@@ -364,11 +342,6 @@ public class Switches extends Activity{
             public void onProgressChanged(SeekBar seekBar, int progress,
                                           boolean fromUser)
             {
-                input_value.add( String.valueOf( progress ) );
-                executeAction( upnpService, action.getService(), action,
-                               action_argument, input_value, true );
-                input_value.clear();
-
                 if (fromUser)
                 {
                     tv = (TextView) ll.findViewWithTag(seekbar_process_tag);
@@ -392,6 +365,10 @@ public class Switches extends Activity{
             {
                 tv = (TextView) ll.findViewWithTag(seekbar_process_tag);
                 tv.setText("Actual Process: " + seekBar.getProgress() + "%");
+                input_value.add( String.valueOf(seekBar.getProgress()) );
+                executeAction( upnpService, action.getService(), action,
+                               action_argument, input_value, true );
+                input_value.clear();
             }
         } );
 
@@ -433,30 +410,13 @@ public class Switches extends Activity{
         });
     }
 
-    private void startEventlistening(Action action,
-                                     StateVariable state_variable)
+    private void startEventlistening(StateVariable state_variable)
     {
-            this.callback = new SwitchPowerSubscriptionCallback (action,
-                            state_variable, this);
+            this.callback =
+                    new SwitchPowerSubscriptionCallback (state_variable, this);
 
             upnpService.getControlPoint().execute(callback);
 
-    }
-
-    public void createSwitchPowerSubscription(Action action)
-    {
-        if(action.getService().hasStateVariables())
-        {
-            for (StateVariable state_variable :
-                    action.getService().getStateVariables())
-            {
-                if(state_variable.getEventDetails().isSendEvents())
-                {
-                    startEventlistening(action, state_variable);
-                    Log.v(TAG, "STATEVARIABLE: " + state_variable);
-                }
-            }
-        }
     }
 
     private void generateUI(Service service, Action action)
@@ -468,22 +428,30 @@ public class Switches extends Activity{
                         (Datatype.Builtin.BOOLEAN))
             {
                     createInputActions(action, action_argument);
-                    createSwitchPowerSubscription(action);
             }
             else if (action_argument.getDatatype().getBuiltin().equals
                         (Datatype.Builtin.UI1))
             {
                     createSeekBarActions(service, action, action_argument);
-                    createSwitchPowerSubscription(action);
             }
         }
 
         for (ActionArgument action_argument : action.getOutputArguments())
         {
             createOutPutActions(action, action_argument);
-            //createSwitchPowerSubscription(action);
         }
 
+    }
+
+    private void setSubscription(Service service)
+    {
+        for (StateVariable stateVariable : service.getStateVariables())
+        {
+            if (stateVariable.getEventDetails().isSendEvents())
+            {
+                startEventlistening(stateVariable);
+            }
+        }
     }
 
     protected void showToast(final String msg, final boolean longLength)
@@ -501,7 +469,6 @@ public class Switches extends Activity{
 
     public void createUPnPServiceandActionInformations(Device upnp_device)
     {
-
         LinearLayout ll;
         ll = (LinearLayout) findViewById(R.id.LinearLayoutDeviceInformation);
         TextView tv;
