@@ -26,7 +26,7 @@
 
                 <TextView
                     android:id = "@+id/InputActionTitle"
-                    android:text="No Input Actions found!"
+                    android:text="No Switch Actions found!"
                     android:layout_height="wrap_content"
                     android:layout_width="fill_parent"
                     android:textStyle = "bold|normal"
@@ -117,7 +117,7 @@
                 android:layout_height = "wrap_content"
                 android:layout_width = "fill_parent"
                 android:orientation="vertical"
-                android:layout_margin="25dp" android:layout_weight="0">
+                android:layout_margin="10dp" android:layout_weight="0">
 
             <TextView
                     android:text="Ereignis Diagramm"
@@ -130,8 +130,10 @@
 
             <LinearLayout
                     android:layout_below="@+id/btn"
-                    android:id="@+id/chart" android:orientation="vertical"
-                    android:layout_width="fill_parent" android:layout_height="wrap_content"
+                    android:id="@+id/chart"
+                    android:orientation="vertical"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1">
 
             </LinearLayout>
