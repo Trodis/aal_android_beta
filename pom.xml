@@ -27,6 +27,11 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
+        <repository>
+            <id>achartengine</id>
+            <name>Public AChartEngine repository</name>
+            <url>https://repository-achartengine.forge.cloudbees.com/snapshot/</url>
+        </repository>
 
     </repositories>
 
@@ -43,9 +48,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.androidplot</groupId>
-            <artifactId>androidplot-core</artifactId>
-            <version>0.6.1-SNAPSHOT</version>
+            <groupId>org.achartengine</groupId>
+            <artifactId>achartengine</artifactId>
+            <version>1.2.0</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
