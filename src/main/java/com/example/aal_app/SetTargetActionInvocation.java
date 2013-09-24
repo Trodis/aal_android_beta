@@ -1,14 +1,10 @@
 package com.example.aal_app;
 
-import android.util.Log;
-import org.teleal.cling.model.action.ActionArgumentValue;
 import org.teleal.cling.model.action.ActionInvocation;
 import org.teleal.cling.model.meta.Action;
 import org.teleal.cling.model.meta.ActionArgument;
 import org.teleal.cling.model.meta.Service;
-import org.teleal.cling.model.types.Datatype;
 import org.teleal.cling.model.types.InvalidValueException;
-import org.teleal.cling.model.types.UnsignedIntegerOneByteDatatype;
 
 import java.util.ArrayList;
 

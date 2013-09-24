@@ -48,7 +48,6 @@ public class Switches extends Activity{
     private AndroidUpnpService upnpService;
     private SubscriptionCallback callback;
     private String unique_device_identifier;
-    private Bundle savedInstanceState;
 
     private GraphicalView mChart;
     private XYMultipleSeriesDataset mDataSet = new XYMultipleSeriesDataset();
@@ -85,21 +84,17 @@ public class Switches extends Activity{
             mRenderer.addSeriesRenderer(mCurrentRenderer);
         }
 
-        mRenderer.setPointSize(3);
-        mRenderer.setYTitle( "y-Axis Value of State Variable" );
-        mRenderer.setXTitle( "x-Axis Times of Received Events" );
-        mRenderer.setAxisTitleTextSize(15);
-        //mRenderer.setYLabels( 2 );
-
         mCurrentRenderer.setFillPoints( true );
-        // mCurrentRenderer.setDisplayChartValues(true);
-
         mCurrentRenderer.setAnnotationsTextAlign( Paint.Align.LEFT );
         mCurrentRenderer.setAnnotationsTextSize(15);
         mCurrentRenderer.setAnnotationsColor(Color.CYAN);
         mCurrentRenderer.setColor(Color.GREEN);
         mCurrentRenderer.setPointStyle( PointStyle.DIAMOND);
 
+        mRenderer.setPointSize(3);
+        mRenderer.setYTitle( "y-Axis Value of State Variable" );
+        mRenderer.setXTitle( "x-Axis Times of Received Events" );
+        mRenderer.setAxisTitleTextSize(15);
         mRenderer.setYLabelsAlign( Paint.Align.LEFT );
         mRenderer.setLegendTextSize(15);
 
@@ -160,7 +155,6 @@ public class Switches extends Activity{
             }
             createUPnPServiceandActionInformations(upnp_device);
         }
-
     }
 
     @Override

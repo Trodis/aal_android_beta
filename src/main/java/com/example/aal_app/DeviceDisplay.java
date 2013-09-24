@@ -1,13 +1,7 @@
 package com.example.aal_app;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-import org.teleal.cling.android.AndroidUpnpService;
 import org.teleal.cling.model.meta.Device;
-import org.teleal.cling.model.meta.Service;
 
-import java.io.Serializable;
-import java.util.ArrayList;
 
 /**
  * Created with IntelliJ IDEA.
@@ -20,9 +14,6 @@ import java.util.ArrayList;
 public class DeviceDisplay {
 
     Device device;
-
-    private AndroidUpnpService upnpService;
-
 
     /**************************************************************************************/
 
@@ -41,16 +32,6 @@ public class DeviceDisplay {
 
         return device.getDetails().getFriendlyName();
 
-    }
-
-    public String getDeviceDescription(){
-        return device.getDetails().getModelDetails().getModelDescription();
-    }
-
-    public Service[] getServices(){
-
-        Service[] service = device.getServices();
-        return service;
     }
 
     @Override

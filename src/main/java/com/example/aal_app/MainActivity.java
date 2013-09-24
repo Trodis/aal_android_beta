@@ -17,23 +17,10 @@ import android.widget.ListView;
 import android.widget.Toast;
 import org.teleal.cling.android.AndroidUpnpService;
 import org.teleal.cling.android.AndroidUpnpServiceImpl;
-import org.teleal.cling.controlpoint.SubscriptionCallback;
-import org.teleal.cling.model.gena.CancelReason;
-import org.teleal.cling.model.gena.GENASubscription;
-import org.teleal.cling.model.message.UpnpResponse;
 import org.teleal.cling.model.meta.*;
-import org.teleal.cling.model.state.StateVariableValue;
-import org.teleal.cling.model.types.BooleanDatatype;
-import org.teleal.cling.model.types.Datatype;
-import org.teleal.cling.model.types.ServiceId;
-import org.teleal.cling.model.types.UDAServiceId;
 import org.teleal.cling.registry.DefaultRegistryListener;
 import org.teleal.cling.registry.Registry;
-
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Map;
 
 public class MainActivity extends ListActivity {
 
@@ -98,7 +85,7 @@ public class MainActivity extends ListActivity {
                     intent.putExtra(EXTRA_MESSAGE, unique_device_identifier);
                     startActivity(intent);
                     showToast(listAdapter.getItem(position).getDeviceName()
-                              + " selected!", true);
+                              + " selected!", false);
                 }
                 else
                 {

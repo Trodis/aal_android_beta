@@ -48,7 +48,9 @@ public class SwitchPowerSubscriptionCallback extends SubscriptionCallback{
                       CancelReason reason,
                       UpnpResponse response)
     {
-        showToast( "Subscription ended", false );
+        showToast( "Subscription of Service " + sub.getService()
+                .getServiceType()
+                .getType(), false );
     }
 
     public void eventReceived(GENASubscription sub) {
@@ -105,10 +107,6 @@ public class SwitchPowerSubscriptionCallback extends SubscriptionCallback{
     protected void showToast(final String msg, final boolean longLength)
     {
         switches.showToast(msg, longLength);
-    }
 
-    public void setCounter(int counter)
-    {
-        this.counter = counter;
     }
 }
