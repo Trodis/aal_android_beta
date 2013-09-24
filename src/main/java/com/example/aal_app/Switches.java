@@ -1,28 +1,19 @@
 package com.example.aal_app;
 
 import android.app.Activity;
-import android.app.ListActivity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.*;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.text.format.Time;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.*;
-import com.androidplot.Plot;
 import org.achartengine.ChartFactory;
 import org.achartengine.GraphicalView;
-import org.achartengine.chart.BarChart;
 import org.achartengine.chart.PointStyle;
-import org.achartengine.chart.XYChart;
 import org.achartengine.model.*;
-import org.achartengine.model.XYSeries;
 import org.achartengine.renderer.*;
 import org.achartengine.renderer.XYSeriesRenderer;
 import org.teleal.cling.android.AndroidUpnpService;
@@ -31,26 +22,12 @@ import org.teleal.cling.controlpoint.ActionCallback;
 import org.teleal.cling.controlpoint.SubscriptionCallback;
 import org.teleal.cling.model.action.ActionArgumentValue;
 import org.teleal.cling.model.action.ActionInvocation;
-import org.teleal.cling.model.gena.CancelReason;
-import org.teleal.cling.model.gena.GENASubscription;
 import org.teleal.cling.model.message.UpnpResponse;
 import org.teleal.cling.model.meta.*;
-import org.teleal.cling.model.state.StateVariableValue;
 import org.teleal.cling.model.types.*;
-
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.text.*;
 import java.util.*;
-
-import android.app.Activity;
 import android.graphics.Color;
-import android.os.Bundle;
-import com.androidplot.Plot;
-import com.androidplot.xy.*;
-
-import java.util.Observable;
-import java.util.Observer;
 
 
 /**
@@ -63,10 +40,10 @@ public class Switches extends Activity{
 
     private String EXTRA_MESSAGE = "UPNP Device";
     private static final String TAG = "AAL LOG: ";
+    private final static String seekbar_process_tag = "SeekBar Process";
 
     private Device upnp_device;
     private ArrayList input_value;
-    private ArrayAdapter<DeviceDisplay> listAdapter;
 
     private AndroidUpnpService upnpService;
     private SubscriptionCallback callback;
@@ -78,45 +55,9 @@ public class Switches extends Activity{
     private XYMultipleSeriesRenderer mRenderer = new XYMultipleSeriesRenderer();
 
     private TimeSeries mCurrentSeries;
-    private org.achartengine.renderer.XYSeriesRenderer mCurrentRenderer;
+    private XYSeriesRenderer mCurrentRenderer;
 
-    private void initChartBoolean()
-    {
-        mCurrentSeries = new TimeSeries("Sample Data");
-        mDataSet.addSeries(mCurrentSeries);
-        mCurrentRenderer = new XYSeriesRenderer();
-        mRenderer.addSeriesRenderer(mCurrentRenderer);
-        mRenderer.setPointSize(3);
-        //mRenderer.setLabelFormat( new DecimalFormat( "0" ) );
-        mRenderer.setYTitle( "Ein und Ausschalt Zyklus" );
-        //mRenderer.setYLabels( 2 );
-        //mRenderer.addYTextLabel( 0, "Ausgeschaltet" );
-        //mRenderer.addYTextLabel( 1, "Eingeschaltet" );
-        mRenderer.setYLabelsAlign( Paint.Align.LEFT );
-        mRenderer.setYLabelsPadding( 2 );
-        mRenderer.setLabelsTextSize( 15 );
-        mRenderer.setShowGrid( true );
-        mRenderer.setZoomButtonsVisible( true);
-        mCurrentRenderer.setPointStyle( PointStyle.DIAMOND);
-        mCurrentRenderer.setFillPoints( true );
-        // mCurrentRenderer.setDisplayChartValues(true);
-        mCurrentRenderer.setColor( Color.WHITE );
-        //mRenderer.setPanEnabled( true, true );
-        mCurrentRenderer.setShowLegendItem( true );
-        mCurrentRenderer.setAnnotationsTextAlign( Paint.Align.LEFT );
-        mCurrentRenderer.setAnnotationsTextSize(15);
-    }
-
-    private void addBoolData(long x, int y){
-        mCurrentSeries.add(x, y);
-        Date date = new Date(System.currentTimeMillis());
-        SimpleDateFormat format = new SimpleDateFormat( "HH:mm:ss" );
-        mCurrentSeries.addAnnotation(format.format(date), x, y);
-
-    }
-
-
-    private final static String seekbar_process_tag = "SeekBar Process";
+    private int save_instance_state_counter = 0;
 
     private ServiceConnection serviceConnection = new ServiceConnection()
     {
@@ -133,6 +74,63 @@ public class Switches extends Activity{
         }
     };
 
+    private void initChartBoolean(String state_variable)
+    {
+        if (mCurrentRenderer == null && mCurrentSeries == null)
+        {
+            mCurrentRenderer = new XYSeriesRenderer();
+            mCurrentSeries = new TimeSeries("Monitoring State " +
+                                            "Variable: " + state_variable);
+            mDataSet.addSeries(mCurrentSeries);
+            mRenderer.addSeriesRenderer(mCurrentRenderer);
+        }
+
+        mRenderer.setPointSize(3);
+        mRenderer.setYTitle( "y-Axis Value of State Variable" );
+        mRenderer.setXTitle( "x-Axis Times of Received Events" );
+        mRenderer.setAxisTitleTextSize(15);
+        //mRenderer.setYLabels( 2 );
+
+        mCurrentRenderer.setFillPoints( true );
+        // mCurrentRenderer.setDisplayChartValues(true);
+
+        mCurrentRenderer.setAnnotationsTextAlign( Paint.Align.LEFT );
+        mCurrentRenderer.setAnnotationsTextSize(15);
+        mCurrentRenderer.setAnnotationsColor(Color.CYAN);
+        mCurrentRenderer.setColor(Color.GREEN);
+        mCurrentRenderer.setPointStyle( PointStyle.DIAMOND);
+
+        mRenderer.setYLabelsAlign( Paint.Align.LEFT );
+        mRenderer.setLegendTextSize(15);
+
+        mRenderer.setLabelsColor(Color.LTGRAY);
+        mRenderer.setAxesColor(Color.LTGRAY);
+        mRenderer.setGridColor(Color.rgb(136, 136, 136));
+        mRenderer.setBackgroundColor(Color.DKGRAY);
+        mRenderer.setApplyBackgroundColor(true);
+
+        mRenderer.setLegendTextSize(20);
+        mRenderer.setLabelsTextSize(20);
+        mRenderer.setPointSize(4);
+        mRenderer.setMargins(new int[] { 60, 60, 60, 60 });
+
+        mRenderer.setFitLegend(true);
+        mRenderer.setZoomButtonsVisible( true);
+        mRenderer.setShowGrid(true);
+        mRenderer.setZoomEnabled(true);
+        mRenderer.setExternalZoomEnabled(true);
+        mRenderer.setAntialiasing(true);
+
+    }
+
+    private void addBoolData(long x, int y){
+        mCurrentSeries.add(x, y);
+        Date date = new Date(System.currentTimeMillis());
+        SimpleDateFormat format = new SimpleDateFormat( "HH:mm:ss" );
+        mCurrentSeries.addAnnotation(format.format(date)+ " Uhr", x, y);
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -142,15 +140,9 @@ public class Switches extends Activity{
         Bundle extras = getIntent().getExtras();
 
         this.unique_device_identifier = extras.getString(EXTRA_MESSAGE);
-        this.savedInstanceState = savedInstanceState;
         input_value = new ArrayList();
-    }
 
-    @Override
-    protected void onResume()
-    {
-        super.onResume();
-        if (upnpService != null && savedInstanceState == null)
+        if (upnpService != null)
         {
             upnp_device = upnpService.getRegistry().getDevice(UDN.valueOf
                     (unique_device_identifier), true);
@@ -168,23 +160,14 @@ public class Switches extends Activity{
             }
             createUPnPServiceandActionInformations(upnp_device);
         }
-        else
-        {
-            this.savedInstanceState = null;
-            onCreate(savedInstanceState);
-        }
 
-        LinearLayout layout = (LinearLayout) findViewById(R.id.chart);
+    }
 
-        if(mChart == null){
-            initChartBoolean();
-            mChart = ChartFactory.getCubeLineChartView( this, mDataSet,
-                                                        mRenderer, 0.2f);
-            layout.addView(mChart);
-        } else {
-            mChart.repaint();
-        }
-
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        onCreate(null);
     }
 
     @Override
@@ -198,30 +181,49 @@ public class Switches extends Activity{
         );
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outStat)
+    {
+        super.onSaveInstanceState( outStat );
+        outStat.putSerializable("dataset", mDataSet);
+        outStat.putSerializable("renderer", mRenderer);
+        outStat.putSerializable("current_series", mCurrentSeries);
+        outStat.putSerializable( "current_renderer", mCurrentRenderer );
+        outStat.putInt( "xAxisCounter", save_instance_state_counter + 1 );
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState)
+    {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        mDataSet = (XYMultipleSeriesDataset)
+                savedInstanceState.getSerializable("dataset");
+        mRenderer = (XYMultipleSeriesRenderer)
+                savedInstanceState.getSerializable("renderer");
+        mCurrentSeries = (TimeSeries)
+                savedInstanceState.getSerializable("current_series");
+        mCurrentRenderer = (XYSeriesRenderer)
+                savedInstanceState.getSerializable("current_renderer");
+        save_instance_state_counter =
+                savedInstanceState.getInt("xAxisCounter");
+    }
+
     @Override protected void onDestroy()
     {
         super.onDestroy();
-        if (upnpService != null)
-        {
-            getApplicationContext().unbindService(serviceConnection);
-            this.listAdapter = null;
-            this.upnp_device = null;
-            this.upnpService = null;
-            this.input_value = null;
-        }
 
         if (callback != null)
         {
             callback.end();
         }
-
     }
 
     @Override
     protected void onPause()
     {
         super.onPause();
-        onDestroy();
+        //onDestroy();
     }
 
     protected void executeAction(AndroidUpnpService upnpService,
@@ -290,7 +292,7 @@ public class Switches extends Activity{
                     input_value.clear();
                 }
             }
-        } );
+        });
         ll.addView(sw);
     }
 
@@ -405,7 +407,7 @@ public class Switches extends Activity{
 
                 SeekBar sb;
                 sb = (SeekBar) ll.findViewWithTag( action.getName() );
-                sb.setProgress( Integer.parseInt(value) );
+                sb.setProgress(Integer.parseInt(value));
             }
         });
     }
@@ -413,9 +415,49 @@ public class Switches extends Activity{
     private void startEventlistening(StateVariable state_variable)
     {
             this.callback =
-                    new SwitchPowerSubscriptionCallback (state_variable, this);
+                    new SwitchPowerSubscriptionCallback (state_variable,
+                        this, save_instance_state_counter);
 
             upnpService.getControlPoint().execute(callback);
+
+        if(mChart == null)
+        {
+            LinearLayout layout = (LinearLayout) findViewById(R.id.chart);
+            //initChartBoolean();
+            mChart = ChartFactory.getCubeLineChartView(this, mDataSet,
+                                                       mRenderer, 0.2f);
+
+            // enable the chart click events
+            mRenderer.setClickEnabled(true);
+            mRenderer.setSelectableBuffer(50);
+            mChart.setOnClickListener(new View.OnClickListener()
+            {
+                public void onClick(View v) {
+                    // handle the click event on the chart
+                    SeriesSelection seriesSelection =
+                            mChart.getCurrentSeriesAndPoint();
+
+                    if (seriesSelection != null)
+                    {
+                        // display information of the clicked point
+                        showToast("y-Wert: " + seriesSelection.getValue()
+                                  + " x-Wert: " + seriesSelection.getXValue()
+                                    ,false );
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+            });
+
+            layout.addView(mChart);
+        }
+        else
+        {
+            mChart.repaint();
+        }
+
 
     }
 
@@ -449,6 +491,7 @@ public class Switches extends Activity{
         {
             if (stateVariable.getEventDetails().isSendEvents())
             {
+                initChartBoolean(stateVariable.getName());
                 startEventlistening(stateVariable);
             }
         }
@@ -473,52 +516,68 @@ public class Switches extends Activity{
         ll = (LinearLayout) findViewById(R.id.LinearLayoutDeviceInformation);
         TextView tv;
 
-        for (Service services : upnp_device.getServices())
-        {
-            tv = new TextView(this);
-            tv.setText("Service " + services.getServiceType().getType() + ":");
-            tv.setHighlightColor(1);
-            tv.setTextColor(Color.rgb(50, 205, 50));
-            tv.setTextSize(17);
-            LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT);
-            ll.addView(tv, p);
-
-            for(Action actions : services.getActions())
-            {
-                tv = new TextView(this);
-                tv.setText(actions.getName());
-                tv.setTextSize( 15 );
-                ll.addView(tv, p);
-            }
-        }
-    }
-
-    public void createUPnPGeneralInformations(Service service)
-    {
-        LinearLayout ll;
-        ll = (LinearLayout) findViewById(R.id.LinearLayoutActionElements);
-
-        TextView tv;
-
         tv = new TextView(this);
-        tv.setText("Device Name: " + service.getDevice().getDetails()
-                .getFriendlyName());
+        tv.setText("Device Name: " + upnp_device.getDetails().getFriendlyName());
         tv.setTextSize(15);
+        ll.addView(tv);
 
         tv = new TextView(this);
-        tv.setText("Device Discription: " +service.getDevice().getDetails()
-                .getManufacturerDetails());
+        tv.setText("Model Discription: " + upnp_device.getDetails()
+                .getModelDetails().getModelDescription());
+        tv.setTextSize(15);
+        ll.addView(tv);
+
+        tv = new TextView(this);
+        tv.setText("Model Number: " + upnp_device.getDetails()
+                .getModelDetails().getModelNumber());
+        tv.setTextSize(15);
+        ll.addView(tv);
+
+        tv = new TextView(this);
+        tv.setText("Model URI: " + upnp_device.getDetails()
+                .getModelDetails().getModelURI());
+        tv.setTextSize(15);
+        ll.addView(tv);
+
+        tv = new TextView(this);
+        tv.setText("Model Name: " + upnp_device.getDetails()
+                .getModelDetails().getModelName());
+        tv.setTextSize(15);
+        ll.addView(tv);
+
+        tv = new TextView(this);
+        tv.setText("Manufacturer: " + upnp_device.getDetails()
+                .getManufacturerDetails().getManufacturer());
+        tv.setTextSize(15);
+        ll.addView(tv);
+
+        tv = new TextView(this);
+        tv.setText("Manufacturer URI: " + upnp_device.getDetails()
+                .getManufacturerDetails().getManufacturerURI());
+        tv.setTextSize(15);
+        ll.addView(tv);
+
+        tv = new TextView(this);
+        tv.setText("Serial Number: " + upnp_device.getDetails()
+                .getSerialNumber());
+        tv.setTextSize(15);
+        ll.addView(tv);
+
+        tv = new TextView(this);
+        tv.setText("PresentationURI: " + upnp_device.getDetails()
+                .getPresentationURI());
         tv.setTextSize(15);
 
         ll.addView(tv);
+
+
     }
 
-    public void addnewPoint(long x, int y){
+    public void addnewPoint(int x, int y){
         addBoolData( x,y );
         if (mChart != null){
             //mRenderer.initAxesRangeForScale(0);
+            save_instance_state_counter = x;
             mChart.repaint();
         }
     }

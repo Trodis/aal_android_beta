@@ -38,7 +38,7 @@ import java.util.Map;
 public class MainActivity extends ListActivity {
 
     public final static String EXTRA_MESSAGE = "UPNP Device";
-    public static ArrayAdapter<DeviceDisplay> listAdapter;
+    private ArrayAdapter<DeviceDisplay> listAdapter;
     private ListView list;
     private BrowseRegistryListener registryListener = new
             BrowseRegistryListener();

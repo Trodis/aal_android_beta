@@ -11,17 +11,18 @@ import org.teleal.cling.model.types.Datatype;
 
 import java.util.*;
 
-public class SwitchPowerSubscriptionCallback extends SubscriptionCallback implements Runnable {
+public class SwitchPowerSubscriptionCallback extends SubscriptionCallback{
 
     Switches switches;
     StateVariable state_variable;
-    int counter = 0;
+    int counter;
     public SwitchPowerSubscriptionCallback(StateVariable state_variable,
-                                           Switches switches)
+                                           Switches switches, int counter)
     {
         super(state_variable.getService());
         this.switches       = switches;
         this.state_variable = state_variable;
+        this.counter = counter;
     }
 
     @Override
@@ -29,7 +30,7 @@ public class SwitchPowerSubscriptionCallback extends SubscriptionCallback implem
     {
         showToast("Subscription with Service established! Listening for " +
                   "Events, renewing in seconds: "
-                + sub.getActualDurationSeconds(), true);
+                + sub.getActualDurationSeconds(), false);
 
     }
 
@@ -104,5 +105,10 @@ public class SwitchPowerSubscriptionCallback extends SubscriptionCallback implem
     protected void showToast(final String msg, final boolean longLength)
     {
         switches.showToast(msg, longLength);
+    }
+
+    public void setCounter(int counter)
+    {
+        this.counter = counter;
     }
 }
