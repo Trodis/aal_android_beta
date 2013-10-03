@@ -35,7 +35,6 @@ class SetTargetActionInvocation extends ActionInvocation {
             }
         } else {
             try{
-                //setOutput(action_argument.getName(), null);
                 setOutput(action_argument.getName(), false);
 
             } catch (InvalidValueException ex){

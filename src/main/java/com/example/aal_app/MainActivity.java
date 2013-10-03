@@ -27,8 +27,8 @@ public class MainActivity extends ListActivity {
     public final static String EXTRA_MESSAGE = "UPNP Device";
     private ArrayAdapter<DeviceDisplay> listAdapter;
     private ListView list;
-    private BrowseRegistryListener registryListener = new
-            BrowseRegistryListener();
+    private BrowseRegistryListener registryListener =
+                                                    new BrowseRegistryListener();
 
     private AndroidUpnpService upnpService;
 
@@ -173,7 +173,8 @@ public class MainActivity extends ListActivity {
             );
             deviceRemoved(device);
         }
-        /* End of optimization, you can remove the whole block if your Android handset is fast (>= 600 Mhz) */
+        /* End of optimization, you can remove the whole block if your
+        Android handset is fast (>= 600 Mhz) */
 
         @Override
         public void remoteDeviceAdded(Registry registry, RemoteDevice device)

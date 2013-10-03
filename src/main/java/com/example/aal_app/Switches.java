@@ -570,7 +570,6 @@ public class Switches extends Activity{
     public void addnewPoint(int x, int y){
         addBoolData( x,y );
         if (mChart != null){
-            //mRenderer.initAxesRangeForScale(0);
             save_instance_state_counter = x;
             mChart.repaint();
         }
