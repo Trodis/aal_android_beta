@@ -27,8 +27,7 @@ public class MainActivity extends ListActivity {
     public final static String EXTRA_MESSAGE = "UPNP Device";
     private ArrayAdapter<DeviceDisplay> listAdapter;
     private ListView list;
-    private BrowseRegistryListener registryListener =
-                                                    new BrowseRegistryListener();
+    private BrowseRegistryListener registryListener = new BrowseRegistryListener();
 
     private AndroidUpnpService upnpService;
 
@@ -72,12 +71,10 @@ public class MainActivity extends ListActivity {
         list.setOnItemClickListener(new AdapterView.OnItemClickListener()
         {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id)
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
-                String unique_device_identifier = listAdapter.getItem
-                        (position).getDevice().getIdentity().getUdn()
-                        .getIdentifierString();
+                String unique_device_identifier = listAdapter.getItem(position).getDevice().getIdentity().getUdn()
+                                                                                           .getIdentifierString();
 
                 if (listAdapter.getItem(position).getDevice().isRoot())
                 {
@@ -154,16 +151,13 @@ public class MainActivity extends ListActivity {
         /* Discovery performance optimization for very slow Android devices! */
 
         @Override
-        public void remoteDeviceDiscoveryStarted(Registry registry,
-                                                 RemoteDevice device)
+        public void remoteDeviceDiscoveryStarted(Registry registry, RemoteDevice device)
         {
             deviceAdded(device);
         }
 
         @Override
-        public void remoteDeviceDiscoveryFailed(Registry registry,
-                                                final RemoteDevice device,
-                                                final Exception ex)
+        public void remoteDeviceDiscoveryFailed(Registry registry, final RemoteDevice device, final Exception ex)
         {
 
             showToast(

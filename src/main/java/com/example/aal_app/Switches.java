@@ -60,8 +60,7 @@ public class Switches extends Activity{
 
     private ServiceConnection serviceConnection = new ServiceConnection()
     {
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service)
+        public void onServiceConnected(ComponentName className, IBinder service)
         {
             upnpService = (AndroidUpnpService) service;
             onResume();
@@ -78,8 +77,7 @@ public class Switches extends Activity{
         if (mCurrentRenderer == null && mCurrentSeries == null)
         {
             mCurrentRenderer = new XYSeriesRenderer();
-            mCurrentSeries = new TimeSeries("Monitoring State " +
-                                            "Variable: " + state_variable);
+            mCurrentSeries = new TimeSeries("Monitoring State Variable: " + state_variable);
             mDataSet.addSeries(mCurrentSeries);
             mRenderer.addSeriesRenderer(mCurrentRenderer);
         }
@@ -118,7 +116,8 @@ public class Switches extends Activity{
 
     }
 
-    private void addBoolData(long x, int y){
+    private void addBoolData(long x, int y)
+    {
         mCurrentSeries.add(x, y);
         Date date = new Date(System.currentTimeMillis());
         SimpleDateFormat format = new SimpleDateFormat( "HH:mm:ss" );
@@ -139,8 +138,7 @@ public class Switches extends Activity{
 
         if (upnpService != null)
         {
-            upnp_device = upnpService.getRegistry().getDevice(UDN.valueOf
-                    (unique_device_identifier), true);
+            upnp_device = upnpService.getRegistry().getDevice(UDN.valueOf(unique_device_identifier), true);
         }
 
         if (this.upnp_device != null)
@@ -168,11 +166,8 @@ public class Switches extends Activity{
     protected void onStart()
     {
         super.onStart();
-        getApplicationContext().bindService(
-                new Intent(this, AndroidUpnpServiceImpl.class),
-                serviceConnection,
-                Context.BIND_AUTO_CREATE
-        );
+        getApplicationContext().bindService(new Intent(this, AndroidUpnpServiceImpl.class), serviceConnection,
+                                                                                            Context.BIND_AUTO_CREATE);
     }
 
     @Override
@@ -191,16 +186,11 @@ public class Switches extends Activity{
     {
         super.onRestoreInstanceState(savedInstanceState);
 
-        mDataSet = (XYMultipleSeriesDataset)
-                savedInstanceState.getSerializable("dataset");
-        mRenderer = (XYMultipleSeriesRenderer)
-                savedInstanceState.getSerializable("renderer");
-        mCurrentSeries = (TimeSeries)
-                savedInstanceState.getSerializable("current_series");
-        mCurrentRenderer = (XYSeriesRenderer)
-                savedInstanceState.getSerializable("current_renderer");
-        save_instance_state_counter =
-                savedInstanceState.getInt("xAxisCounter");
+        mDataSet = (XYMultipleSeriesDataset) savedInstanceState.getSerializable("dataset");
+        mRenderer = (XYMultipleSeriesRenderer) savedInstanceState.getSerializable("renderer");
+        mCurrentSeries = (TimeSeries) savedInstanceState.getSerializable("current_series");
+        mCurrentRenderer = (XYSeriesRenderer) savedInstanceState.getSerializable("current_renderer");
+        save_instance_state_counter = savedInstanceState.getInt("xAxisCounter");
     }
 
     @Override protected void onDestroy()
@@ -220,35 +210,28 @@ public class Switches extends Activity{
         //onDestroy();
     }
 
-    protected void executeAction(AndroidUpnpService upnpService,
-                                 Service service, final Action action,
-                                 final ActionArgument action_argument,
-                                 ArrayList input_value, boolean isInput)
+    protected void executeAction(AndroidUpnpService upnpService, Service service, final Action action,
+                                 final ActionArgument action_argument, ArrayList input_value, boolean isInput)
     {
 
-        ActionInvocation setTargetInvocation = new SetTargetActionInvocation
-                (service, action, action_argument, input_value, isInput);
+        ActionInvocation setTargetInvocation = new SetTargetActionInvocation (service, action, action_argument,
+                                                                              input_value, isInput);
 
         // Executes asynchronous in the background
-        upnpService.getControlPoint().execute
-                (new ActionCallback(setTargetInvocation)
+        upnpService.getControlPoint().execute(new ActionCallback(setTargetInvocation)
                 {
                     @Override
                     public void success(ActionInvocation invocation)
                     {
                         if (action.hasOutputArguments())
                         {
-                            ActionArgumentValue value  = invocation.getOutput
-                                    (action_argument.getName());
-                            showToast("Received Value: " +  value.getValue()
-                                    .toString(), false);
+                            ActionArgumentValue value  = invocation.getOutput(action_argument.getName());
+                            showToast("Received Value: " + value.getValue().toString(), false);
                         }
                     }
 
                     @Override
-                    public void failure(ActionInvocation invocation,
-                                        UpnpResponse operation,
-                                        String defaultMsg)
+                    public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
                     {
                         showToast(defaultMsg, true);
                     }
@@ -256,11 +239,9 @@ public class Switches extends Activity{
         );
     }
 
-    public void createInputActions( final Action action,
-                                    final ActionArgument action_argument)
+    public void createInputActions( final Action action, final ActionArgument action_argument)
     {
-        LinearLayout ll = (LinearLayout) findViewById(R.id
-                .LinearLayoutInputActionElements);
+        LinearLayout ll = (LinearLayout) findViewById(R.id.LinearLayoutInputActionElements);
 
         TextView tv = (TextView) (findViewById( R.id.InputActionTitle ));
         tv.setText( "Input Action" );
@@ -276,13 +257,11 @@ public class Switches extends Activity{
 
                 if ( isChecked ) {
                     input_value.add( true );
-                    executeAction( upnpService, action.getService(), action,
-                                   action_argument, input_value, true );
+                    executeAction( upnpService, action.getService(), action, action_argument, input_value, true );
                     input_value.clear();
                 } else {
                     input_value.add( false );
-                    executeAction( upnpService, action.getService(), action,
-                                   action_argument, input_value, true );
+                    executeAction( upnpService, action.getService(), action, action_argument, input_value, true );
                     input_value.clear();
                 }
             }
@@ -290,11 +269,9 @@ public class Switches extends Activity{
         ll.addView(sw);
     }
 
-    public void createOutPutActions( final Action action,
-                                     final ActionArgument action_argument)
+    public void createOutPutActions( final Action action, final ActionArgument action_argument)
     {
-        LinearLayout ll = (LinearLayout) findViewById(R.id
-                .LinearLayoutOutPutActionElements);
+        LinearLayout ll = (LinearLayout) findViewById(R.id.LinearLayoutOutPutActionElements);
         TextView tv = (TextView) findViewById( R.id.OutPutActionTitle );
         tv.setText( "Output Actions" );
 
@@ -304,20 +281,16 @@ public class Switches extends Activity{
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                executeAction(upnpService, action.getService(), action,
-                        action_argument, input_value, false);
+                executeAction(upnpService, action.getService(), action, action_argument, input_value, false);
             }
         });
         ll.addView(button);
     }
 
-    public void createSeekBarActions(final Service service,
-                                     final Action action,
-                                     final ActionArgument action_argument)
+    public void createSeekBarActions(final Service service, final Action action, final ActionArgument action_argument)
     {
-        int max_range = (int) service.getStateVariable( action_argument
-                             .getRelatedStateVariableName()).getTypeDetails()
-                .getAllowedValueRange().getMaximum();
+        int max_range = (int) service.getStateVariable(action_argument.getRelatedStateVariableName()).getTypeDetails()
+                                                                        .getAllowedValueRange().getMaximum();
 
         final LinearLayout ll;
         ll = (LinearLayout) findViewById(R.id.LinearLayoutSeekBarElements);
@@ -328,15 +301,13 @@ public class Switches extends Activity{
         SeekBar sb = new SeekBar(this);
         sb.setTag(action.getName());
         sb.setMax(max_range);
-        sb.setProgressDrawable( getResources().getDrawable(
-                R.drawable.progressbar ) );
+        sb.setProgressDrawable( getResources().getDrawable(R.drawable.progressbar));
 
         sb.setOnSeekBarChangeListener( new SeekBar.OnSeekBarChangeListener()
         {
             TextView tv;
             @Override
-            public void onProgressChanged(SeekBar seekBar, int progress,
-                                          boolean fromUser)
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
             {
                 if (fromUser)
                 {
@@ -361,9 +332,8 @@ public class Switches extends Activity{
             {
                 tv = (TextView) ll.findViewWithTag(seekbar_process_tag);
                 tv.setText("Actual Process: " + seekBar.getProgress() + "%");
-                input_value.add( String.valueOf(seekBar.getProgress()) );
-                executeAction( upnpService, action.getService(), action,
-                               action_argument, input_value, true );
+                input_value.add( String.valueOf(seekBar.getProgress()));
+                executeAction( upnpService, action.getService(), action, action_argument, input_value, true );
                 input_value.clear();
             }
         } );
@@ -381,8 +351,7 @@ public class Switches extends Activity{
         {
             public void run()
             {
-                final View ll = findViewById(R.id
-                        .LinearLayoutActionElements);
+                final View ll = findViewById(R.id.LinearLayoutActionElements);
 
                 Switch mySwitch;
                 mySwitch = (Switch) ll.findViewWithTag(action.getName());
@@ -400,7 +369,7 @@ public class Switches extends Activity{
                 final View ll = findViewById(R.id.LinearLayoutActionElements);
 
                 SeekBar sb;
-                sb = (SeekBar) ll.findViewWithTag( action.getName() );
+                sb = (SeekBar) ll.findViewWithTag(action.getName());
                 sb.setProgress(Integer.parseInt(value));
             }
         });
@@ -409,8 +378,7 @@ public class Switches extends Activity{
     private void startEventlistening(StateVariable state_variable)
     {
             this.callback =
-                    new SwitchPowerSubscriptionCallback (state_variable,
-                        this, save_instance_state_counter);
+                          new SwitchPowerSubscriptionCallback (state_variable, this, save_instance_state_counter);
 
             upnpService.getControlPoint().execute(callback);
 
@@ -418,8 +386,7 @@ public class Switches extends Activity{
         {
             LinearLayout layout = (LinearLayout) findViewById(R.id.chart);
             //initChartBoolean();
-            mChart = ChartFactory.getCubeLineChartView(this, mDataSet,
-                                                       mRenderer, 0.2f);
+            mChart = ChartFactory.getCubeLineChartView(this, mDataSet, mRenderer, 0.2f);
 
             // enable the chart click events
             mRenderer.setClickEnabled(true);
@@ -434,9 +401,8 @@ public class Switches extends Activity{
                     if (seriesSelection != null)
                     {
                         // display information of the clicked point
-                        showToast("y-Wert: " + seriesSelection.getValue()
-                                  + " x-Wert: " + seriesSelection.getXValue()
-                                    ,false );
+                        showToast("y-Wert: " + seriesSelection.getValue() + " x-Wert: " + seriesSelection.getXValue()
+                                                                                        ,false );
                     }
                     else
                     {
@@ -460,13 +426,11 @@ public class Switches extends Activity{
 
         for (ActionArgument action_argument : action.getInputArguments())
         {
-            if(action_argument.getDatatype().getBuiltin().equals
-                        (Datatype.Builtin.BOOLEAN))
+            if(action_argument.getDatatype().getBuiltin().equals(Datatype.Builtin.BOOLEAN))
             {
                     createInputActions(action, action_argument);
             }
-            else if (action_argument.getDatatype().getBuiltin().equals
-                        (Datatype.Builtin.UI1))
+            else if (action_argument.getDatatype().getBuiltin().equals(Datatype.Builtin.UI1))
             {
                     createSeekBarActions(service, action, action_argument);
             }
