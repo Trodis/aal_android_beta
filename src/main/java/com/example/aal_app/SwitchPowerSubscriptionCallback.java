@@ -16,8 +16,7 @@ public class SwitchPowerSubscriptionCallback extends SubscriptionCallback{
     Switches switches;
     StateVariable state_variable;
     int counter;
-    public SwitchPowerSubscriptionCallback(StateVariable state_variable,
-                                           Switches switches, int counter)
+    public SwitchPowerSubscriptionCallback(StateVariable state_variable, Switches switches, int counter)
     {
         super(state_variable.getService());
         this.switches       = switches;
