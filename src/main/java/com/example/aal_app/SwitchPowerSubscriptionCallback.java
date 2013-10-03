@@ -28,46 +28,35 @@ public class SwitchPowerSubscriptionCallback extends SubscriptionCallback{
     @Override
     public void established(GENASubscription sub)
     {
-        showToast("Subscription with Service established! Listening for " +
-                  "Events, renewing in seconds: "
-                + sub.getActualDurationSeconds(), false);
+        showToast("Subscription with Service established! Listening for Events, renewing in seconds: "
+                                                              + sub.getActualDurationSeconds(), false);
 
     }
 
     @Override
-    protected void failed(GENASubscription subscription,
-                          UpnpResponse responseStatus,
-                          Exception exception,
-                          String defaultMsg)
+    protected void failed(GENASubscription subscription, UpnpResponse responseStatus, Exception exception,
+                                                                                      String defaultMsg)
     {
         showToast(defaultMsg, true);
     }
 
     @Override
-    public void ended(GENASubscription sub,
-                      CancelReason reason,
-                      UpnpResponse response)
+    public void ended(GENASubscription sub, CancelReason reason, UpnpResponse response)
     {
-        showToast( "Subscription of Service " + sub.getService()
-                .getServiceType()
-                .getType(), false );
+        showToast( "Subscription of Service " + sub.getService().getServiceType().getType(), false );
     }
 
-    public void eventReceived(GENASubscription sub) {
+    public void eventReceived(GENASubscription sub)
+    {
         Map<String, StateVariableValue> values = sub.getCurrentValues();
-        StateVariableValue state_Variable_Value = values
-                .get( state_variable.getName() );
+        StateVariableValue state_Variable_Value = values.get(state_variable.getName());
 
         if (state_Variable_Value.getValue() != null)
         {
-            if (state_Variable_Value.getDatatype()
-                    .getBuiltin().equals( Datatype.Builtin.BOOLEAN ))
+            if (state_Variable_Value.getDatatype().getBuiltin().equals( Datatype.Builtin.BOOLEAN ))
             {
-                boolean received_value =
-                        (Boolean)state_Variable_Value.getValue();
-
-                switches.addnewPoint(counter,
-                                     Boolean.valueOf(received_value).compareTo(false));
+                boolean received_value = (Boolean)state_Variable_Value.getValue();
+                switches.addnewPoint(counter, Boolean.valueOf(received_value).compareTo(false));
 
                 for (Action action : state_variable.getService().getActions())
                 {
@@ -77,19 +66,15 @@ public class SwitchPowerSubscriptionCallback extends SubscriptionCallback{
                     }
                 }
             }
-            else if ( state_Variable_Value.getDatatype().getBuiltin()
-                        .equals( Datatype.Builtin.UI1))
+            else if ( state_Variable_Value.getDatatype().getBuiltin().equals( Datatype.Builtin.UI1))
             {
-                switches.addnewPoint(counter,
-                        Integer.parseInt(state_Variable_Value.getValue()
-                            .toString()));
+                switches.addnewPoint(counter, Integer.parseInt(state_Variable_Value.getValue().toString()));
 
                 for (Action action : state_variable.getService().getActions())
                 {
                     if (action.hasInputArguments())
                     {
-                        switches.setSeekBar(state_Variable_Value.getValue()
-                                                    .toString(), action);
+                        switches.setSeekBar(state_Variable_Value.getValue().toString(), action);
                     }
                 }
             }
