@@ -88,7 +88,7 @@ public class MainActivity extends ListActivity {
                 }
                 else
                 {
-                        showToast("Error: his UPnP Device has no Services! Cant handle it!", true);
+                        showToast("Error: This UPnP Device has no Services! Cant handle it!", true);
                 }
             }
         });
