@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 import org.teleal.cling.android.AndroidUpnpService;
 import org.teleal.cling.android.AndroidUpnpServiceImpl;
 import org.teleal.cling.model.meta.*;
+import org.teleal.cling.protocol.async.SendingNotificationAlive;
 import org.teleal.cling.registry.DefaultRegistryListener;
 import org.teleal.cling.registry.Registry;
 import java.util.Comparator;
@@ -76,7 +78,7 @@ public class MainActivity extends ListActivity {
                 String unique_device_identifier = listAdapter.getItem(position).getDevice().getIdentity().getUdn()
                                                                                            .getIdentifierString();
 
-                if (listAdapter.getItem(position).getDevice().isRoot())
+                if (listAdapter.getItem(position).getDevice().hasServices())
                 {
                     Intent intent = new Intent(MainActivity.this, Switches.class);
                     intent.putExtra(EXTRA_MESSAGE, unique_device_identifier);
@@ -86,7 +88,7 @@ public class MainActivity extends ListActivity {
                 }
                 else
                 {
-                    showToast("This UPnP Device is not a root device!!!", true);
+                        showToast("Error: his UPnP Device has no Services! Cant handle it!", true);
                 }
             }
         });

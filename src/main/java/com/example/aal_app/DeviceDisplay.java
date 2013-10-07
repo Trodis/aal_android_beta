@@ -13,7 +13,7 @@ import org.teleal.cling.model.meta.Device;
 
 public class DeviceDisplay {
 
-    Device device;
+    private Device device;
 
     /**************************************************************************************/
 
@@ -31,7 +31,6 @@ public class DeviceDisplay {
     public String getDeviceName(){
 
         return device.getDetails().getFriendlyName();
-
     }
 
     @Override

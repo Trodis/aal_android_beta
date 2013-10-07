@@ -46,6 +46,7 @@ public class Switches extends Activity{
     private ArrayList input_value;
 
     private AndroidUpnpService upnpService;
+    private LinkedList<SubscriptionCallback> subscription_list;
     private SubscriptionCallback callback;
     private String unique_device_identifier;
 
@@ -135,6 +136,7 @@ public class Switches extends Activity{
 
         this.unique_device_identifier = extras.getString(EXTRA_MESSAGE);
         input_value = new ArrayList();
+        subscription_list = new LinkedList<SubscriptionCallback>();
 
         if (upnpService != null)
         {
@@ -196,10 +198,12 @@ public class Switches extends Activity{
     @Override protected void onDestroy()
     {
         super.onDestroy();
-
-        if (callback != null)
+        if (!subscription_list.isEmpty())
         {
-            callback.end();
+            while(!subscription_list.isEmpty())
+            {
+                subscription_list.poll().end();
+            }
         }
     }
 
@@ -210,12 +214,12 @@ public class Switches extends Activity{
         //onDestroy();
     }
 
-    protected void executeAction(AndroidUpnpService upnpService, Service service, final Action action,
+    protected void executeAction(AndroidUpnpService upnpService, final Action action,
                                  final ActionArgument action_argument, ArrayList input_value, boolean isInput)
     {
 
-        ActionInvocation setTargetInvocation = new SetTargetActionInvocation (service, action, action_argument,
-                                                                              input_value, isInput);
+        ActionInvocation setTargetInvocation = new SetTargetActionInvocation (action, action_argument, input_value,
+                                                                              isInput);
 
         // Executes asynchronous in the background
         upnpService.getControlPoint().execute(new ActionCallback(setTargetInvocation)
@@ -239,29 +243,33 @@ public class Switches extends Activity{
         );
     }
 
-    public void createInputActions( final Action action, final ActionArgument action_argument)
+    public void createInputActions(final Action action, final ActionArgument action_argument)
     {
         LinearLayout ll = (LinearLayout) findViewById(R.id.LinearLayoutInputActionElements);
 
         TextView tv = (TextView) (findViewById( R.id.InputActionTitle ));
-        tv.setText( "Input Action" );
+        tv.setText("Input Action");
 
         Switch sw = new Switch(this);
         sw.setText(action.getName());
-        sw.setTag( action.getName() );
-        sw.setOnCheckedChangeListener( new CompoundButton
-                .OnCheckedChangeListener() {
+        sw.setTag(action.getName());
+        sw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+        {
             @Override
             public void onCheckedChanged(CompoundButton buttonView,
-                                         boolean isChecked) {
+                                         boolean isChecked)
+            {
 
-                if ( isChecked ) {
-                    input_value.add( true );
-                    executeAction( upnpService, action.getService(), action, action_argument, input_value, true );
+                if (isChecked)
+                {
+                    input_value.add(true);
+                    executeAction(upnpService, action, action_argument, input_value, true );
                     input_value.clear();
-                } else {
-                    input_value.add( false );
-                    executeAction( upnpService, action.getService(), action, action_argument, input_value, true );
+                }
+                else
+                {
+                    input_value.add(false);
+                    executeAction(upnpService, action, action_argument, input_value, true );
                     input_value.clear();
                 }
             }
@@ -278,10 +286,12 @@ public class Switches extends Activity{
         Button button = new Button(this);
         button.setText(action.getName());
         button.setTag(action.getName());
-        button.setOnClickListener(new View.OnClickListener() {
+        button.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
-                executeAction(upnpService, action.getService(), action, action_argument, input_value, false);
+            public void onClick(View v)
+            {
+                executeAction(upnpService, action, action_argument, input_value, false);
             }
         });
         ll.addView(button);
@@ -333,7 +343,7 @@ public class Switches extends Activity{
                 tv = (TextView) ll.findViewWithTag(seekbar_process_tag);
                 tv.setText("Actual Process: " + seekBar.getProgress() + "%");
                 input_value.add( String.valueOf(seekBar.getProgress()));
-                executeAction( upnpService, action.getService(), action, action_argument, input_value, true );
+                executeAction(upnpService, action, action_argument, input_value, true );
                 input_value.clear();
             }
         } );
@@ -377,11 +387,9 @@ public class Switches extends Activity{
 
     private void startEventlistening(StateVariable state_variable)
     {
-            this.callback =
-                          new SwitchPowerSubscriptionCallback (state_variable, this, save_instance_state_counter);
-
-            upnpService.getControlPoint().execute(callback);
-
+        subscription_list.add(new SwitchPowerSubscriptionCallback(state_variable, this,
+                                                                  save_instance_state_counter));
+        upnpService.getControlPoint().execute(subscription_list.getLast());
         if(mChart == null)
         {
             LinearLayout layout = (LinearLayout) findViewById(R.id.chart);
@@ -395,14 +403,13 @@ public class Switches extends Activity{
             {
                 public void onClick(View v) {
                     // handle the click event on the chart
-                    SeriesSelection seriesSelection =
-                            mChart.getCurrentSeriesAndPoint();
+                    SeriesSelection seriesSelection = mChart.getCurrentSeriesAndPoint();
 
                     if (seriesSelection != null)
                     {
                         // display information of the clicked point
-                        showToast("y-Wert: " + seriesSelection.getValue() + " x-Wert: " + seriesSelection.getXValue()
-                                                                                        ,false );
+                        showToast("Statevariable-Wert: " + seriesSelection.getValue() + "Zyklus-Wert: " +
+                                  seriesSelection.getXValue(), false );
                     }
                     else
                     {
@@ -438,7 +445,11 @@ public class Switches extends Activity{
 
         for (ActionArgument action_argument : action.getOutputArguments())
         {
-            createOutPutActions(action, action_argument);
+            if(action_argument.getDatatype().getBuiltin().equals(Datatype.Builtin.BOOLEAN) ||
+               action_argument.getDatatype().getBuiltin().equals(Datatype.Builtin.UI1))
+            {
+                createOutPutActions(action, action_argument);
+            }
         }
 
     }
