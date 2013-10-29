@@ -29,7 +29,8 @@ public class SwitchPowerSubscriptionCallback extends SubscriptionCallback{
     public void established(GENASubscription sub)
     {
         showToast("Subscription of " + state_variable.getName() + " established!", false);
-
+        switches.setStateVariableStatus(false);
+        switches.updateGENAStatusTextView();
     }
 
     @Override
@@ -50,12 +51,13 @@ public class SwitchPowerSubscriptionCallback extends SubscriptionCallback{
         else
         {
             showToast( "Subscription canceled! Reason: " + reason.name(), true);
+            switches.setStateVariableStatus(true);
+            switches.updateGENAStatusTextView();
         }
     }
 
     public void eventReceived(GENASubscription sub)
     {
-
         Map<String, StateVariableValue> values = sub.getCurrentValues();
         StateVariableValue state_Variable_Value = values.get(state_variable.getName());
 

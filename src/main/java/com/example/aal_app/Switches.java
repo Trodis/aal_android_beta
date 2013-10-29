@@ -8,6 +8,8 @@ import android.content.ServiceConnection;
 import android.graphics.*;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
 import org.achartengine.ChartFactory;
@@ -41,14 +43,17 @@ public class Switches extends Activity{
     private String EXTRA_MESSAGE = "UPNP Device";
     private static final String TAG = "AAL LOG: ";
     private final static String seekbar_process_tag = "SeekBar Process";
+    private final static String gena_status_textview = "genau_status_textview";
 
     private Device upnp_device;
     private ArrayList input_value;
 
     private AndroidUpnpService upnpService;
     private LinkedList<SubscriptionCallback> subscription_list;
+    private LinkedList<StateVariable> stateVariables_list;
     private SubscriptionCallback callback;
     private String unique_device_identifier;
+    private boolean statevariable_gone_offline = false;
 
     private GraphicalView mChart;
     private XYMultipleSeriesDataset mDataSet = new XYMultipleSeriesDataset();
@@ -122,7 +127,7 @@ public class Switches extends Activity{
         mCurrentSeries.add(x, y);
         Date date = new Date(System.currentTimeMillis());
         SimpleDateFormat format = new SimpleDateFormat( "HH:mm:ss" );
-        mCurrentSeries.addAnnotation(format.format(date)+ " Uhr", x, y);
+        mCurrentSeries.addAnnotation(format.format(date) + " Uhr", x, y);
     }
 
 
@@ -137,6 +142,7 @@ public class Switches extends Activity{
         this.unique_device_identifier = extras.getString(EXTRA_MESSAGE);
         input_value = new ArrayList();
         subscription_list = new LinkedList<SubscriptionCallback>();
+        stateVariables_list = new LinkedList<StateVariable>();
 
         if (upnpService != null)
         {
@@ -145,6 +151,7 @@ public class Switches extends Activity{
 
         if (this.upnp_device != null)
         {
+            createUPnPServiceandActionInformations(upnp_device);
             for (Service service : upnp_device.getServices())
             {
                 for(Action action : service.getActions())
@@ -153,7 +160,6 @@ public class Switches extends Activity{
                 }
                 setSubscription(service);
             }
-            createUPnPServiceandActionInformations(upnp_device);
         }
     }
 
@@ -277,7 +283,7 @@ public class Switches extends Activity{
         ll.addView(sw);
     }
 
-    public void createOutPutActions( final Action action, final ActionArgument action_argument)
+    public void createOutPutActions(final Action action, final ActionArgument action_argument)
     {
         LinearLayout ll = (LinearLayout) findViewById(R.id.LinearLayoutOutPutActionElements);
         TextView tv = (TextView) findViewById( R.id.OutPutActionTitle );
@@ -394,7 +400,7 @@ public class Switches extends Activity{
         {
             LinearLayout layout = (LinearLayout) findViewById(R.id.chart);
             //initChartBoolean();
-            mChart = ChartFactory.getCubeLineChartView(this, mDataSet, mRenderer, 0.2f);
+            mChart = ChartFactory.getCubeLineChartView(this, mDataSet, mRenderer, 0.01f);
 
             // enable the chart click events
             mRenderer.setClickEnabled(true);
@@ -408,7 +414,7 @@ public class Switches extends Activity{
                     if (seriesSelection != null)
                     {
                         // display information of the clicked point
-                        showToast("Statevariable-Wert: " + seriesSelection.getValue() + "Zyklus-Wert: " +
+                        showToast("Statevariable-Wert: " + seriesSelection.getValue() + " Zyklus-Wert: " +
                                   seriesSelection.getXValue(), false );
                     }
                     else
@@ -458,10 +464,14 @@ public class Switches extends Activity{
     {
         for (StateVariable stateVariable : service.getStateVariables())
         {
-            if (stateVariable.getEventDetails().isSendEvents())
+            Datatype.Builtin stateVariable_dataType = stateVariable.getTypeDetails().getDatatype().getBuiltin();
+            if (stateVariable.getEventDetails().isSendEvents() &&
+                        (stateVariable_dataType.equals( Datatype.Builtin.BOOLEAN) ||
+                            stateVariable_dataType.equals(Datatype.Builtin.UI1)))
             {
                 initChartBoolean(stateVariable.getName());
                 startEventlistening(stateVariable);
+                stateVariables_list.add(stateVariable);
             }
         }
     }
@@ -484,6 +494,14 @@ public class Switches extends Activity{
         LinearLayout ll;
         ll = (LinearLayout) findViewById(R.id.LinearLayoutDeviceInformation);
         TextView tv;
+        TextView gena_status_tv;
+
+        gena_status_tv = new TextView(this);
+        gena_status_tv.setText("GENA Subscription Status: not activated! ");
+        gena_status_tv.setTextSize(15);
+        gena_status_tv.setTextColor(Color.MAGENTA);
+        gena_status_tv.setTag(gena_status_textview);
+        ll.addView(gena_status_tv);
 
         tv = new TextView(this);
         tv.setText("Device Name: " + upnp_device.getDetails().getFriendlyName());
@@ -548,6 +566,75 @@ public class Switches extends Activity{
             save_instance_state_counter = x;
             mChart.repaint();
         }
+    }
+
+    public void updateGENAStatusTextView()
+    {
+        runOnUiThread(new Runnable()
+        {
+            public void run()
+            {
+                LinearLayout ll;
+                ll = (LinearLayout) findViewById(R.id.LinearLayoutDeviceInformation);
+                TextView gena_status_tv;
+                gena_status_tv = (TextView) ll.findViewWithTag(gena_status_textview);
+
+                if (getStateVariableStatus())
+                {
+                    gena_status_tv.setText( "GENA Subscription Status: offline" );
+                    gena_status_tv.setTextColor( Color.RED );
+                }
+                else
+                {
+                    gena_status_tv.setText( "GENA Subscription Status: online" );
+                    gena_status_tv.setTextColor( Color.GREEN );
+                }
+            }
+        });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        menu.add(0, 0, 0, R.string.establish_subscription);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case 0:
+                reestablish_gena();
+                break;
+        }
+        return false;
+    }
+
+    public void setStateVariableStatus(boolean status)
+    {
+        statevariable_gone_offline = status;
+    }
+
+    public boolean getStateVariableStatus()
+    {
+        return this.statevariable_gone_offline;
+    }
+
+    private void reestablish_gena()
+    {
+        if(statevariable_gone_offline)
+        {
+            save_instance_state_counter++;
+            startEventlistening(stateVariables_list.getLast());
+
+        }
+        else
+        {
+            showToast("Subscription already online", false);
+        }
+
     }
 
 }

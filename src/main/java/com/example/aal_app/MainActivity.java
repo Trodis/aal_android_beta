@@ -151,7 +151,7 @@ public class MainActivity extends ListActivity {
     {
 
         /* Discovery performance optimization for very slow Android devices! */
-
+        /*
         @Override
         public void remoteDeviceDiscoveryStarted(Registry registry, RemoteDevice device)
         {
@@ -169,6 +169,7 @@ public class MainActivity extends ListActivity {
             );
             deviceRemoved(device);
         }
+
         /* End of optimization, you can remove the whole block if your
         Android handset is fast (>= 600 Mhz) */
 
