@@ -1,5 +1,16 @@
 package com.example.aal_app;
 
+/**
+ * Copyrigt (c) 2013, Hochschule Bochum
+ * Diese Software wurde im Rahmen eines Software Projektes für die Hochschule Bochum entwickelt.
+ * Dieser Code darf nicht ohne Einverständniss von Dr. Prof. Weidauer weiterentwickelt oder zu eigenen Zwecken
+ * genutzt werden. Bitte kontaktieren Sie Herr Weidauer, für weitere Fragen.
+ */
+
+
+/**
+ * Alle nötigen Bibliotheken werden eingebunden für das Android Framework und Cling Framework
+ */
 
 import android.os.Bundle;
 import android.app.ListActivity;
@@ -24,6 +35,19 @@ import org.teleal.cling.registry.DefaultRegistryListener;
 import org.teleal.cling.registry.Registry;
 import java.util.Comparator;
 
+/**
+ * Diese Klasse ist die Hauptklasse, wo alle UPnP Geräte gesucht und aufgelistet werden. Der Nutzer soll nach der
+ * Auflistung die Möglichkeit haben, eines der UPnP Geräte auszuwählen und es anschließend zu bedienen.
+ *
+ * Dieser Code wurde wie bereits oben erwähnt im Rahmen eines Software Projektes entwickelt. Erfahrene Entwickler,
+ * werden viele verbesserungs Vorschläge und Kritik haben. Auch wurde vermutlich nicht jedes Problem,
+ * auf die Weise gelöst, die ein erfahrener Entwickler gelöst hätte. Diesbezüglich bitte ich um Nachsicht und die
+ * entsprechend herangehensweise beim Lesen des Codes.
+ *
+ * @author Ferhat Özmen
+ * @version 0.1
+ */
+
 public class MainActivity extends ListActivity {
 
     public final static String EXTRA_MESSAGE = "UPNP Device";
@@ -33,9 +57,17 @@ public class MainActivity extends ListActivity {
 
     private AndroidUpnpService upnpService;
 
+
     private ServiceConnection serviceConnection = new ServiceConnection()
     {
-
+        /**
+         * Ein Service muss im Hintergrund laufen während die App läuft um neue UPnP Geräte automatisch zu finden
+         * und wieder von der Liste zu entfernen sofern das UPnP Gerät vom Netzwerk getrennt wurde.
+         *
+         * @param className Für welche Klasse der Service gestartet werden soll
+         * @param service Der eigentliche Service, der gebunden und im Hintergrund
+         *                laufen soll
+         */
         public void onServiceConnected(ComponentName className, IBinder service)
         {
             upnpService = (AndroidUpnpService) service;
@@ -54,12 +86,21 @@ public class MainActivity extends ListActivity {
             upnpService.getControlPoint().search();
         }
 
+        /**
+         * Den UPnP Service im Hintergrund wieder deaktivieren, wenn die App beendet wird.
+         * @param className FÜr welche Klasse der Service beendet werden.
+         */
         public void onServiceDisconnected(ComponentName className)
         {
             upnpService = null;
         }
     };
 
+    /**
+     * onCreate Methode vom Android Framework (siehe Android Lifecycle auf google)
+     * @param savedInstanceState Ein mapping von String Werten
+     *                           und Elementen die vom Typ Parcelable sind.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -72,6 +113,18 @@ public class MainActivity extends ListActivity {
 
         list.setOnItemClickListener(new AdapterView.OnItemClickListener()
         {
+            /**
+             * Diese Methode onItemClick wird dann aufgerufen, sobald ein UPnP Gerät aus der Liste ausgewählt wurde.
+             * Die Parameter werden automatisch vom Android Framework an die Methode übergeben. Anschließend muss eine
+             * Prüfung stattfinden, um was für ein UPnP Gerät es sich handelt. Wenn das UPnP Gerät nämlich, keine
+             * Services hat, dann wird damit nicht weiter gearbeitet und entsprechende Fehlermeldung ausgegeben.
+             *
+             * @param parent Eltern AdapterView.
+             * @param view   Basis Block für die Erzeugung und Interaktion
+             *               mit grafischen Elementen.
+             * @param position Welche Position ausgewählt wurde, aus der Liste der UPnP Geräte
+             * @param id Welche id das jeweilige Element ausgewählte Element hat.
+             */
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
@@ -94,6 +147,9 @@ public class MainActivity extends ListActivity {
         });
     }
 
+    /**
+     * Android Framework onStart() Methode (siehe Android Lifecycle auf google).
+     */
     @Override
     protected void onStart()
     {
@@ -105,6 +161,12 @@ public class MainActivity extends ListActivity {
         );
     }
 
+    /**
+     * Android Framework onDestroy() Methode (siehe Android Lifecycle auf google).
+     * Wenn die App beendet wird, wird diese Methode automatisch aufgerufen. Der UPnP Service wird beendet, um
+     * alle nötigen Ressource für das Tablet wieder freizugeben, die von der App für das Service zur Laufzeit,
+     * benötigt wurden.
+     */
     @Override
     protected  void onDestroy()
     {
@@ -116,6 +178,14 @@ public class MainActivity extends ListActivity {
         getApplicationContext().unbindService(serviceConnection);
     }
 
+    /**
+     * Das Standard Menü der Activity wird initialisiert, wenn der User wünscht, eine manuelle Suche zu starten. Kann
+     * der User über das Android Standard Activity Menü, eine neue Suche starten.
+     * @param menu das Menü Parameter wird automatisch
+     *             vom Framework zur Laufzeit übergeben.
+     * @return Diese Methode muss true zurück liefern, damit das Menü angezeigt wird.
+     *
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
@@ -123,6 +193,14 @@ public class MainActivity extends ListActivity {
         return true;
     }
 
+    /**
+     * Wenn aus dem Menü das Element ausgewählt wurde, eine manuelle Suche zu starten.
+     * Wird diese Methode vom Framework aufgerufen. Um anschließend die Methode searchNetwork() aufzurufen.
+     *
+     * @param item Welches menü Element ausgewählt wurde.
+     *             Anhand der ID kann festgestellt welches menü Element ausgewählt wurde.
+     * @return Der Rückgabewert ist false, sofern die ID nicht gefunden werden kann.
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
@@ -135,6 +213,10 @@ public class MainActivity extends ListActivity {
         return false;
     }
 
+    /**
+     * Diese Methode startet die manuelle Suche nach UPnP Geräten.
+     *
+     */
     protected void searchNetwork()
     {
         if (upnpService == null)
@@ -147,6 +229,14 @@ public class MainActivity extends ListActivity {
         upnpService.getControlPoint().search();
     }
 
+    /**
+     * Die Klasse BrowseRegistryListener, kümmert sich um die gefunden UPnP Geräte im Netzwerk. Diese Klasse hat die
+     * Aufgabe alle UPnP Geräte der Liste hinzuzufügen um Sie anschließend auf dem Tablet darstellen zu können. Sofern
+     * eine UPnP Gerät nicht mehr im Netzwerk ist, wird dieser auch wieder von der Liste entfernt. Der Auskommentierte
+     * Code ist nur für sehr langsame Android Geräte, um die Verwaltung der UPnP Geräte nicht zu lange andauern zu
+     * lassen.
+     *
+     */
     protected class BrowseRegistryListener extends DefaultRegistryListener
     {
 
@@ -173,6 +263,12 @@ public class MainActivity extends ListActivity {
         /* End of optimization, you can remove the whole block if your
         Android handset is fast (>= 600 Mhz) */
 
+        /**
+         *
+         * @param registry Die Cling Registry von allen Geräten und Services die dem lokalen UPnP Stack
+         *                 bekannt sind.
+         * @param device Das Geräte das ausgewärtet
+         */
         @Override
         public void remoteDeviceAdded(Registry registry, RemoteDevice device)
         {

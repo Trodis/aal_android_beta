@@ -33,9 +33,8 @@ import android.graphics.Color;
 
 
 /**
- * @author Ferhat Özmen
+ * Diese
  */
-
 
 
 public class Switches extends Activity{
@@ -78,6 +77,10 @@ public class Switches extends Activity{
         }
     };
 
+    /**
+     *
+     * @param state_variable
+     */
     private void initChartBoolean(String state_variable)
     {
         if (mCurrentRenderer == null && mCurrentSeries == null)
