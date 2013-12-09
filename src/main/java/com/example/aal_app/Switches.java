@@ -33,7 +33,10 @@ import android.graphics.Color;
 
 
 /**
- * Diese
+ * In dieser Klassen wird das ausgewählte UPnP Gerät,
+ * vollständig ausgewertet mit seinen Services, Statevariablen, Actions und Action Argumenten. Anschließend wird die
+ * entsprechende GUI aufgebaut und auf dem Tablet dargestellt. Zudem wird die relevante Statevariable angemeldet,
+ * um auf Events zu reagieren, um die GUI, mit den neuen Werten vom UPnP Gerät zu aktualisieren.
  */
 
 
@@ -63,6 +66,15 @@ public class Switches extends Activity{
 
     private int save_instance_state_counter = 0;
 
+    /**
+     * Der UPnP Serivce wird hier seperat angelegt. Um unabhängig von anderen Klassen,
+     * das UPnP Gerät auszuwerten zu können. Anschließend wird die onResume() Methode explizit aufgerufen um
+     * sicherzustellen, dass onCreate() nicht aufgerufen wird, bevor ein upnpservice agefordert wurde.
+     *
+     * @param className F&uuml;r welche Klasse der Service gestartet werden soll
+     * @param service Der eigentliche Service, der gebunden und im Hintergrund
+     *                laufen soll
+     */
     private ServiceConnection serviceConnection = new ServiceConnection()
     {
         public void onServiceConnected(ComponentName className, IBinder service)
@@ -78,8 +90,11 @@ public class Switches extends Activity{
     };
 
     /**
+     * In dieser Methode wird das Diagramm initialisiert. Das heißt alle Objekte, die nötig sind um mit der Bibliothek
+     * acharts ein Diagramm anzufertigen, werden erzeugt. Zu dem werden die optischen Eigenschaften,
+     * des Diagrammes festgelegt und kann auch nach eigenen Wünschen umgestaltet werden.
      *
-     * @param state_variable
+     * @param state_variable die Statevariable wird, welches im Diagramm überwacht werden soll, wird erwartet.
      */
     private void initChartBoolean(String state_variable)
     {
@@ -125,6 +140,12 @@ public class Switches extends Activity{
 
     }
 
+    /**
+     * Diese Methode fügt auf dem Diagramm einen neuen Punkt an der Stelle x,y ein mit einem Zeitstempel.
+     *
+     * @param x Die x Koordinate, in diesem Falle die Anzahl der Event Zyklen.
+     * @param y Die y Koordinate, in diesem Falle der Wert, welcher dem UPnP Gerät gesendet wurde.
+     */
     private void addBoolData(long x, int y)
     {
         mCurrentSeries.add(x, y);
@@ -133,7 +154,17 @@ public class Switches extends Activity{
         mCurrentSeries.addAnnotation(format.format(date) + " Uhr", x, y);
     }
 
-
+    /**
+     * Android Framework onDestroy() Methode (siehe Android Lifecycle auf google).
+     * onCreate Methode vom Android Framework (siehe Android Lifecycle auf google). Diese Methode wurde überschrieben
+     * um die Auswertung des UPnP Gerätes zu bewerkstelligen. Das heißt hier werden die Services,
+     * Statevariablen  und Actions ausgewertet und die GUI entsprechend aufgebaut. Anschließend wird noch die
+     * Statevariable als GENAEvent angemeldet.
+     *
+     * @param savedInstanceState Ein mapping von String Werten
+     *                           und Elementen die vom Typ Parcelable sind.
+     * @override die onCreate() Methode des Android Frameworks.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -166,6 +197,13 @@ public class Switches extends Activity{
         }
     }
 
+    /**
+     * Android Framework onResume() Methode (siehe Android Lifecycle auf google).
+     * Die onResume() Methode wird aufgerufen, um genau die Reihenfolge festzulegen. Es darf also onCreate() nicht
+     * aufgerufen werden, bevor der upnpservice angefordert wurde.
+     *
+     * @override die onCreate() Methode des Android Frameworks.
+     */
     @Override
     protected void onResume()
     {
@@ -173,6 +211,13 @@ public class Switches extends Activity{
         onCreate(null);
     }
 
+    /**
+     * Android Framework onStart() Methode (siehe Android Lifecycle auf google).
+     * Die onStart Methode wird noch vor onCreate() aufgerufen. Der eigentlich upnpservice,
+     * wird also hier für diese Klasse gebunden und gestartet.
+     *
+     * @override die onStart() Methode des Android Frameworks.
+     */
     @Override
     protected void onStart()
     {
@@ -181,6 +226,14 @@ public class Switches extends Activity{
                                                                                             Context.BIND_AUTO_CREATE);
     }
 
+    /**
+     * Diese Methode speichert, die Werte vom Diagramm, falls das Tablet gedreht wurde. Also die Orientierung sich
+     * geändert hat. Denn bei einer neuen Orientierung, werden alle Objekte zerstört und wieder neu aufgebaut. Jedoch
+     * muss man sich selber um die speicherung der relevanten Daten kümmern.
+     *
+     * @param outStat variable vom Typ Bundle wird übergeben. Die Klasse Bundle hat viele Hilfsmethoden um Daten zu
+     *                speichern.
+     */
     @Override
     protected void onSaveInstanceState(Bundle outStat)
     {
@@ -192,6 +245,14 @@ public class Switches extends Activity{
         outStat.putInt( "xAxisCounter", save_instance_state_counter + 1 );
     }
 
+    /**
+     * Diese Methode wird aufgerufen, um die zuvor gespeicherten Werte wieder abzurufen und die objekte neu zu
+     * initialiseren.
+     *
+     * @param savedInstanceState variable vom Typ Bundle wird übergeben, Die Klasse Bundle hat viele Hilfsmethoden
+     *                           um die Daten wieder abzrufen.
+     * @override die onRestoreInstanceState() Methode des Android Frameworks.
+     */
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState)
     {
@@ -204,6 +265,11 @@ public class Switches extends Activity{
         save_instance_state_counter = savedInstanceState.getInt("xAxisCounter");
     }
 
+    /**
+     * Diese Methode wird aufgerufen wenn die App geschlossen wird bzw. beendet. Die Statevariablen werden komplett
+     * abgemeldet, um unnötige Ressourcen nicht zu verschwenden.
+     *
+     */
     @Override protected void onDestroy()
     {
         super.onDestroy();
@@ -223,6 +289,17 @@ public class Switches extends Activity{
         //onDestroy();
     }
 
+    /**
+     * Die executeAction Methode, ruft die Methode der Klasse SetTargetActionInvocation auf,
+     * um dem UPnP Gerät die Argumente bzw. Werte zu senden. Es wird geprüft ob es sich um einen Input oder Output
+     * Argument handelt, dass mit neuen Werten versorgt werden soll.
+     *
+     * @param upnpService das upnpservice des jeweiligen UPnP Gerätes wird erwartet.
+     * @param action die action vom jeweiligen UPnP Gerät wird erwartet.
+     * @param action_argument das Action Argument vom UPnP Gerät wird erwartet.
+     * @param input_value der eigentliche Wert der an das UPnP Gerät gesendet werden soll, wird erwartet.
+     * @param isInput es wird geprüft ob es sich um einen Input oder Output Wert handelt.
+     */
     protected void executeAction(AndroidUpnpService upnpService, final Action action,
                                  final ActionArgument action_argument, ArrayList input_value, boolean isInput)
     {
@@ -252,6 +329,15 @@ public class Switches extends Activity{
         );
     }
 
+    /**
+     * In dieser Methode werden die Buttons erzeugt für die InputActions. Die Buttons bekommen einen Tag,
+     * um später zuordnen zu können zur welcher Action das jewelige Button gehört. Die Methode executeAction wird
+     * aufgerufen und die entsprechenden boolean Werte übergeben. Abhängig davon in welcher Stellung der Button ist
+     * (AN oder AUS).
+     *
+     * @param action die action vom jeweiligen UPnP Gerät wird erwartet.
+     * @param action_argument das Action Argument vom UPnP Gerät wird erwartet.
+     */
     public void createInputActions(final Action action, final ActionArgument action_argument)
     {
         LinearLayout ll = (LinearLayout) findViewById(R.id.LinearLayoutInputActionElements);
@@ -286,6 +372,15 @@ public class Switches extends Activity{
         ll.addView(sw);
     }
 
+    /**
+     * In dieser Methode werden die Buttons erzeugt für die OutputActions. Die Buttons bekommen einen Tag,
+     * um später zuordnen zu können zur welcher Action das jewelige Button gehört. Sobald ein OutputButton betätigt
+     * wurde, wir die Methode setOnClickListener aufgerufen und daraufhin die executeAction Methode um dem UPnP Gerät
+     * den neuen Wert zu senden.
+     *
+     * @param action die action vom jeweiligen UPnP Gerät wird erwartet.
+     * @param action_argument das Action Argument vom UPnP Gerät wird erwartet.
+     */
     public void createOutPutActions(final Action action, final ActionArgument action_argument)
     {
         LinearLayout ll = (LinearLayout) findViewById(R.id.LinearLayoutOutPutActionElements);
@@ -306,6 +401,16 @@ public class Switches extends Activity{
         ll.addView(button);
     }
 
+    /**
+     * In dieser Methode werden die SeekBar erzeugt für die InputActions. Das jeweilige SeekBar bekommt einen Tag,
+     * um später zuordnen zu können zur welcher Action das SeekBar gehört. Die Methode prüft ob und wann der
+     * Schiebeschalter betätigt und wieder losgelassen wurde. Dementsprechend werden die Informationen über die
+     * SeekBar aktualisiert und der neue Wert an die Methode executeAction() übergeben.
+     *
+     * @param service der Service vom UPnP Gerät wird erwartet.
+     * @param action die action vom jeweiligen UPnP Gerät wird erwartet.
+     * @param action_argument das Action Argument vom UPnP Gerät wird erwartet.
+     */
     public void createSeekBarActions(final Service service, final Action action, final ActionArgument action_argument)
     {
         int max_range = (int) service.getStateVariable(action_argument.getRelatedStateVariableName()).getTypeDetails()
@@ -364,6 +469,11 @@ public class Switches extends Activity{
         ll.addView(sb);
     }
 
+    /**
+     * Diese Methode wird aufgerufen, wenn ein GENA Event eingegangen ist.
+     * @param is_checked
+     * @param action
+     */
     public void setSwitch(final boolean is_checked,final Action action)
     {
         runOnUiThread(new Runnable()

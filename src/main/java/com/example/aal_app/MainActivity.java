@@ -36,15 +36,15 @@ import org.teleal.cling.registry.Registry;
 import java.util.Comparator;
 
 /**
- * Diese Klasse ist die Hauptklasse, wo alle UPnP Geräte gesucht und aufgelistet werden. Der Nutzer soll nach der
- * Auflistung die Möglichkeit haben, eines der UPnP Geräte auszuwählen und es anschließend zu bedienen.
+ * Diese Klasse ist die Hauptklasse, wo alle UPnP Ger&auml;te gesucht und aufgelistet werden. Der Nutzer soll nach der
+ * Auflistung die M&ouml;glichkeit haben, eines der UPnP Ger&auml;te auszuw&auml;hlen und es anschlie&szlig;end zu bedienen.
  *
- * Dieser Code wurde wie bereits oben erwähnt im Rahmen eines Software Projektes entwickelt. Erfahrene Entwickler,
- * werden viele verbesserungs Vorschläge und Kritik haben. Auch wurde vermutlich nicht jedes Problem,
- * auf die Weise gelöst, die ein erfahrener Entwickler gelöst hätte. Diesbezüglich bitte ich um Nachsicht und die
+ * Dieser Code wurde wie bereits oben erw&auml;hnt im Rahmen eines Software Projektes entwickelt. Erfahrene Entwickler,
+ * werden viele verbesserungs Vorschl&auml;ge und Kritik haben. Auch wurde vermutlich nicht jedes Problem,
+ * auf die Weise gel&ouml;st, die ein erfahrener Entwickler gel&ouml;st h&auml;tte. Diesbez&uuml;glich bitte ich um Nachsicht und die
  * entsprechend herangehensweise beim Lesen des Codes.
  *
- * @author Ferhat Özmen
+ * @author Ferhat &Ouml;zmen
  * @version 0.1
  */
 
@@ -61,10 +61,10 @@ public class MainActivity extends ListActivity {
     private ServiceConnection serviceConnection = new ServiceConnection()
     {
         /**
-         * Ein Service muss im Hintergrund laufen während die App läuft um neue UPnP Geräte automatisch zu finden
-         * und wieder von der Liste zu entfernen sofern das UPnP Gerät vom Netzwerk getrennt wurde.
+         * Ein Service muss im Hintergrund laufen w&auml;hrend die App l&auml;uft um neue UPnP Ger&auml;te automatisch zu finden
+         * und wieder von der Liste zu entfernen sofern das UPnP Ger&auml;t vom Netzwerk getrennt wurde.
          *
-         * @param className Für welche Klasse der Service gestartet werden soll
+         * @param className F&uuml;r welche Klasse der Service gestartet werden soll
          * @param service Der eigentliche Service, der gebunden und im Hintergrund
          *                laufen soll
          */
@@ -88,7 +88,7 @@ public class MainActivity extends ListActivity {
 
         /**
          * Den UPnP Service im Hintergrund wieder deaktivieren, wenn die App beendet wird.
-         * @param className FÜr welche Klasse der Service beendet werden.
+         * @param className F&Uuml;r welche Klasse der Service beendet werden.
          */
         public void onServiceDisconnected(ComponentName className)
         {
@@ -100,6 +100,7 @@ public class MainActivity extends ListActivity {
      * onCreate Methode vom Android Framework (siehe Android Lifecycle auf google)
      * @param savedInstanceState Ein mapping von String Werten
      *                           und Elementen die vom Typ Parcelable sind.
+     * @override die onCreate() Methode des Android Frameworks.
      */
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -149,6 +150,8 @@ public class MainActivity extends ListActivity {
 
     /**
      * Android Framework onStart() Methode (siehe Android Lifecycle auf google).
+     *
+     * @override die onStart() Methode des Android Frameworks.
      */
     @Override
     protected void onStart()
@@ -164,8 +167,10 @@ public class MainActivity extends ListActivity {
     /**
      * Android Framework onDestroy() Methode (siehe Android Lifecycle auf google).
      * Wenn die App beendet wird, wird diese Methode automatisch aufgerufen. Der UPnP Service wird beendet, um
-     * alle nötigen Ressource für das Tablet wieder freizugeben, die von der App für das Service zur Laufzeit,
-     * benötigt wurden.
+     * alle n&ouml;tigen Ressource f&uuml;r das Tablet wieder freizugeben, die von der App f&uuml;r das Service zur Laufzeit,
+     * ben&ouml;tigt wurden.
+     *
+     * @override die onDestroy() Methode des Android Frameworks.
      */
     @Override
     protected  void onDestroy()
@@ -179,11 +184,12 @@ public class MainActivity extends ListActivity {
     }
 
     /**
-     * Das Standard Menü der Activity wird initialisiert, wenn der User wünscht, eine manuelle Suche zu starten. Kann
-     * der User über das Android Standard Activity Menü, eine neue Suche starten.
-     * @param menu das Menü Parameter wird automatisch
-     *             vom Framework zur Laufzeit übergeben.
-     * @return Diese Methode muss true zurück liefern, damit das Menü angezeigt wird.
+     * Das Standard Men&uuml; der Activity wird initialisiert, wenn der User w&uuml;nscht, eine manuelle Suche zu starten. Kann
+     * der User &uuml;ber das Android Standard Activity Men&uuml;, eine neue Suche starten.
+     * @param menu das Men&uuml; Parameter wird automatisch
+     *             vom Framework zur Laufzeit &uuml;bergeben.
+     * @return Diese Methode muss true zur&uuml;ck liefern, damit das Men&uuml; angezeigt wird.
+     * @override die onCreateOptionsMenu() Methode, des Android Frameworks.
      *
      */
     @Override
@@ -194,12 +200,12 @@ public class MainActivity extends ListActivity {
     }
 
     /**
-     * Wenn aus dem Menü das Element ausgewählt wurde, eine manuelle Suche zu starten.
-     * Wird diese Methode vom Framework aufgerufen. Um anschließend die Methode searchNetwork() aufzurufen.
+     * Wenn aus dem Men&uuml; das Element ausgew&auml;hlt wurde, eine manuelle Suche zu starten.
+     * Wird diese Methode vom Framework aufgerufen. Um anschlie&szlig;end die Methode searchNetwork() aufzurufen.
      *
-     * @param item Welches menü Element ausgewählt wurde.
-     *             Anhand der ID kann festgestellt welches menü Element ausgewählt wurde.
-     * @return Der Rückgabewert ist false, sofern die ID nicht gefunden werden kann.
+     * @param item Welches men&uuml; Element ausgew&auml;hlt wurde.
+     *             Anhand der ID kann festgestellt welches men&uuml; Element ausgew&auml;hlt wurde.
+     * @return Der R&uuml;ckgabewert ist false, sofern die ID nicht gefunden werden kann.
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
@@ -230,10 +236,10 @@ public class MainActivity extends ListActivity {
     }
 
     /**
-     * Die Klasse BrowseRegistryListener, kümmert sich um die gefunden UPnP Geräte im Netzwerk. Diese Klasse hat die
-     * Aufgabe alle UPnP Geräte der Liste hinzuzufügen um Sie anschließend auf dem Tablet darstellen zu können. Sofern
-     * eine UPnP Gerät nicht mehr im Netzwerk ist, wird dieser auch wieder von der Liste entfernt. Der Auskommentierte
-     * Code ist nur für sehr langsame Android Geräte, um die Verwaltung der UPnP Geräte nicht zu lange andauern zu
+     * Die Klasse BrowseRegistryListener, k&uuml;mmert sich um die gefunden UPnP Ger&auml;te im Netzwerk. Diese Klasse hat die
+     * Aufgabe alle UPnP Ger&auml;te der Liste hinzuzuf&uuml;gen um Sie anschlie&szlig;end auf dem Tablet darstellen zu k&ouml;nnen. Sofern
+     * eine UPnP Ger&auml;t nicht mehr im Netzwerk ist, wird dieser auch wieder von der Liste entfernt. Der Auskommentierte
+     * Code ist nur f&uuml;r sehr langsame Android Ger&auml;te, um die Verwaltung der UPnP Ger&auml;te nicht zu lange andauern zu
      * lassen.
      *
      */
@@ -264,10 +270,11 @@ public class MainActivity extends ListActivity {
         Android handset is fast (>= 600 Mhz) */
 
         /**
+         * Neues Ger&auml;t aus dem Netzwerk, soll hinzugef&uuml;gt werden.
          *
-         * @param registry Die Cling Registry von allen Geräten und Services die dem lokalen UPnP Stack
+         * @param registry Die Cling Registry von allen Ger&auml;ten und Services die dem lokalen UPnP Stack
          *                 bekannt sind.
-         * @param device Das Geräte das ausgewärtet
+         * @param device Das Ger&auml;te das ausgew&auml;rtet wurde mit seinen service meta Daten.
          */
         @Override
         public void remoteDeviceAdded(Registry registry, RemoteDevice device)
@@ -276,6 +283,14 @@ public class MainActivity extends ListActivity {
             deviceAdded(device);
         }
 
+        /**
+         * Vorhandenes Ger&auml;t soll aus der Liste wird entfernt, welches nicht mehr im Netzwerk ist.
+         *
+         * @param registry Die Cling Registry von allen Ger&auml;ten und Services die dem lokalen UPnP Stack
+         *                 bekannt sind.
+         * @param device Das UPnP Ger&auml;t das ausgew&auml;rtet wurde mit seinen service meta Daten.
+         *
+         */
         @Override
         public void remoteDeviceRemoved(Registry registry, RemoteDevice device)
         {
@@ -283,6 +298,13 @@ public class MainActivity extends ListActivity {
             deviceRemoved(device);
         }
 
+        /**
+         * Lokales Ger&auml;t soll hinzugef&uuml;gt werden.
+         *
+         * @param registry Die Cling Registry von allen Ger&auml;ten und Services die dem lokalen UPnP Stack
+         *                 bekannt sind.
+         * @param device Das Ger&auml;te das ausgew&auml;rtet wurde mit seinen service meta Daten.
+         */
         @Override
         public void localDeviceAdded(Registry registry, LocalDevice device)
         {
@@ -290,6 +312,13 @@ public class MainActivity extends ListActivity {
             deviceAdded(device);
         }
 
+        /**
+         * Lokales Ger&auml;t wird entfernt.
+         *
+         * @param registry Die Cling Registry von allen Ger&auml;ten und Services die dem lokalen UPnP Stack
+         *                   bekannt sind.
+         * @param device Das Ger&auml;te das ausgew&auml;rtet wurde mit seinen service meta Daten.
+         */
         @Override
         public void localDeviceRemoved(Registry registry, LocalDevice device)
         {
@@ -297,6 +326,13 @@ public class MainActivity extends ListActivity {
             deviceRemoved(device);
         }
 
+        /**
+         * Das UPnP Ger&auml;t welches gefunden wurde, wird nun dem listAdapter hinzugef&uuml;gt. Um es sp&auml;ter
+         * auflisten zu k&ouml;nnen. Dabei findet das hinzuf&uuml;gen in einem runOnUiThread statt,
+         * da Android es sonst nicht erlaubt
+         * ohne diesen Thread das UI zur Laufzeit zu ver&auml;ndern.
+         * @param device Das Ger&auml;te das ausgew&auml;rtet wurde mit seinen service meta Daten.
+         */
         public void deviceAdded(final Device device)
         {
 
@@ -324,6 +360,13 @@ public class MainActivity extends ListActivity {
             });
         }
 
+        /**
+         * Das UPnP Ger&auml;t wird &uuml;ber diese Methode aus dem listAdapter und somit aus der Liste entfernt. Auch hier ist
+         * ein Eingriff zur Laufzeit nur m&ouml;glich wenn es &uuml;ber den runOnUiThread stattfindet,
+         * da die UI ver&auml;ndert werden soll.
+         *
+         * @param device Das Ger&auml;te das ausgew&auml;rtet wurde mit seinen service meta Daten.
+         */
         public void deviceRemoved(final Device device)
         {
 
@@ -338,6 +381,14 @@ public class MainActivity extends ListActivity {
 
     }
 
+    /**
+     * Diese Methode dient dazu um die Toast Messages auf dem Android Ger&auml;t auszugeben. Es kann f&uuml;r Fehlermeldung und
+     * andere Meldungen genutzt werden um Informationen dem User mitzuteilen.
+     *
+     * @param msg Die Nachricht die als Toast ausgegeben werden soll.
+     * @param longLength Es kann True &uuml;bergeben werden die dauer der Toast Message lange andauern soll, oder
+     *                   False falls die Toast Nachricht nur kurz bestehen soll.
+     */
     protected void showToast(final String msg, final boolean longLength)
     {
         runOnUiThread(new Runnable()
@@ -353,7 +404,9 @@ public class MainActivity extends ListActivity {
         });
     }
 
-
+    /**
+     * Diese Methode dient nur dazu um die Liste der UPnP Ger&auml;t zu nach Ihrem Namen zu sortieren.
+     */
     static final Comparator<DeviceDisplay> DISPLAY_COMPARATOR =
             new Comparator<DeviceDisplay>()
             {
