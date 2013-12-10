@@ -5,6 +5,8 @@ package com.example.aal_app;
  * Diese Software wurde im Rahmen eines Software Projektes für die Hochschule Bochum entwickelt.
  * Dieser Code darf nicht ohne Einverständniss von Dr. Prof. Weidauer weiterentwickelt oder zu eigenen Zwecken
  * genutzt werden. Bitte kontaktieren Sie Herr Weidauer, für weitere Fragen.
+ * @author Ferhat Özmen
+ * @version 0.1
  */
 
 
@@ -100,7 +102,6 @@ public class MainActivity extends ListActivity {
      * onCreate Methode vom Android Framework (siehe Android Lifecycle auf google)
      * @param savedInstanceState Ein mapping von String Werten
      *                           und Elementen die vom Typ Parcelable sind.
-     * @override die onCreate() Methode des Android Frameworks.
      */
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -151,7 +152,6 @@ public class MainActivity extends ListActivity {
     /**
      * Android Framework onStart() Methode (siehe Android Lifecycle auf google).
      *
-     * @override die onStart() Methode des Android Frameworks.
      */
     @Override
     protected void onStart()
@@ -170,7 +170,6 @@ public class MainActivity extends ListActivity {
      * alle n&ouml;tigen Ressource f&uuml;r das Tablet wieder freizugeben, die von der App f&uuml;r das Service zur Laufzeit,
      * ben&ouml;tigt wurden.
      *
-     * @override die onDestroy() Methode des Android Frameworks.
      */
     @Override
     protected  void onDestroy()
@@ -189,8 +188,6 @@ public class MainActivity extends ListActivity {
      * @param menu das Men&uuml; Parameter wird automatisch
      *             vom Framework zur Laufzeit &uuml;bergeben.
      * @return Diese Methode muss true zur&uuml;ck liefern, damit das Men&uuml; angezeigt wird.
-     * @override die onCreateOptionsMenu() Methode, des Android Frameworks.
-     *
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu)

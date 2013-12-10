@@ -47,7 +47,6 @@ public class DeviceDisplay {
     /**
      * Die equals Methode wird überschrieben, um die vorhandenen Geräte in der Liste hinzuzufügen oder zu entfernen.
      * @param o Referenz von Typ der Klasse Object.
-     * @overrides equals in class Object
      * @return Falls das Gerät bereits in der Liste existiert wird ein true zurückgeliefert.
      */
     @Override
@@ -62,7 +61,6 @@ public class DeviceDisplay {
     /**
      * Der Haschode vom UPnP Gerät wird zurückgeliefert.
      *
-     * @override die hashCode() Methode der Klasse Object.
      * @return Der Hashcode des Geräte wird zurückgeliefert.
      */
     @Override

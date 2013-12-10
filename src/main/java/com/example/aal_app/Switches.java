@@ -33,10 +33,12 @@ import android.graphics.Color;
 
 
 /**
- * In dieser Klassen wird das ausgewählte UPnP Gerät,
- * vollständig ausgewertet mit seinen Services, Statevariablen, Actions und Action Argumenten. Anschließend wird die
+ * In dieser Klassen wird das ausgew&auml;hlte UPnP Ger&auml;t,
+ * vollst&auml;ndig ausgewertet mit seinen Services, Statevariablen, Actions und Action Argumenten. Anschlie&szlig;end wird die
  * entsprechende GUI aufgebaut und auf dem Tablet dargestellt. Zudem wird die relevante Statevariable angemeldet,
- * um auf Events zu reagieren, um die GUI, mit den neuen Werten vom UPnP Gerät zu aktualisieren.
+ * um auf Events zu reagieren, um die GUI, mit den neuen Werten vom UPnP Ger&auml;t zu aktualisieren.
+ * @author Ferhat &Ouml;zmen
+ * @version 0.1
  */
 
 
@@ -67,8 +69,8 @@ public class Switches extends Activity{
     private int save_instance_state_counter = 0;
 
     /**
-     * Der UPnP Serivce wird hier seperat angelegt. Um unabhängig von anderen Klassen,
-     * das UPnP Gerät auszuwerten zu können. Anschließend wird die onResume() Methode explizit aufgerufen um
+     * Der UPnP Serivce wird hier seperat angelegt. Um unabh&auml;ngig von anderen Klassen,
+     * das UPnP Ger&auml;t auszuwerten zu k&ouml;nnen. Anschlie&szlig;end wird die onResume() Methode explizit aufgerufen um
      * sicherzustellen, dass onCreate() nicht aufgerufen wird, bevor ein upnpservice agefordert wurde.
      *
      * @param className F&uuml;r welche Klasse der Service gestartet werden soll
@@ -90,11 +92,11 @@ public class Switches extends Activity{
     };
 
     /**
-     * In dieser Methode wird das Diagramm initialisiert. Das heißt alle Objekte, die nötig sind um mit der Bibliothek
+     * In dieser Methode wird das Diagramm initialisiert. Das hei&szlig;t alle Objekte, die n&ouml;tig sind um mit der Bibliothek
      * acharts ein Diagramm anzufertigen, werden erzeugt. Zu dem werden die optischen Eigenschaften,
-     * des Diagrammes festgelegt und kann auch nach eigenen Wünschen umgestaltet werden.
+     * des Diagrammes festgelegt und kann auch nach eigenen W&uuml;nschen umgestaltet werden.
      *
-     * @param state_variable die Statevariable wird, welches im Diagramm überwacht werden soll, wird erwartet.
+     * @param state_variable die Statevariable wird, welches im Diagramm &uuml;berwacht werden soll, wird erwartet.
      */
     private void initChartBoolean(String state_variable)
     {
@@ -141,10 +143,10 @@ public class Switches extends Activity{
     }
 
     /**
-     * Diese Methode fügt auf dem Diagramm einen neuen Punkt an der Stelle x,y ein mit einem Zeitstempel.
+     * Diese Methode f&uuml;gt auf dem Diagramm einen neuen Punkt an der Stelle x,y ein mit einem Zeitstempel.
      *
      * @param x Die x Koordinate, in diesem Falle die Anzahl der Event Zyklen.
-     * @param y Die y Koordinate, in diesem Falle der Wert, welcher dem UPnP Gerät gesendet wurde.
+     * @param y Die y Koordinate, in diesem Falle der Wert, welcher dem UPnP Ger&auml;t gesendet wurde.
      */
     private void addBoolData(long x, int y)
     {
@@ -156,15 +158,15 @@ public class Switches extends Activity{
 
     /**
      * Android Framework onDestroy() Methode (siehe Android Lifecycle auf google).
-     * onCreate Methode vom Android Framework (siehe Android Lifecycle auf google). Diese Methode wurde überschrieben
-     * um die Auswertung des UPnP Gerätes zu bewerkstelligen. Das heißt hier werden die Services,
-     * Statevariablen  und Actions ausgewertet und die GUI entsprechend aufgebaut. Anschließend wird noch die
+     * onCreate Methode vom Android Framework (siehe Android Lifecycle auf google). Diese Methode wurde &uuml;berschrieben
+     * um die Auswertung des UPnP Ger&auml;tes zu bewerkstelligen. Das hei&szlig;t hier werden die Services,
+     * Statevariablen  und Actions ausgewertet und die GUI entsprechend aufgebaut. Anschlie&szlig;end wird noch die
      * Statevariable als GENAEvent angemeldet.
      *
      * @param savedInstanceState Ein mapping von String Werten
      *                           und Elementen die vom Typ Parcelable sind.
-     * @override die onCreate() Methode des Android Frameworks.
      */
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -202,7 +204,6 @@ public class Switches extends Activity{
      * Die onResume() Methode wird aufgerufen, um genau die Reihenfolge festzulegen. Es darf also onCreate() nicht
      * aufgerufen werden, bevor der upnpservice angefordert wurde.
      *
-     * @override die onCreate() Methode des Android Frameworks.
      */
     @Override
     protected void onResume()
@@ -214,9 +215,8 @@ public class Switches extends Activity{
     /**
      * Android Framework onStart() Methode (siehe Android Lifecycle auf google).
      * Die onStart Methode wird noch vor onCreate() aufgerufen. Der eigentlich upnpservice,
-     * wird also hier für diese Klasse gebunden und gestartet.
+     * wird also hier f&uuml;r diese Klasse gebunden und gestartet.
      *
-     * @override die onStart() Methode des Android Frameworks.
      */
     @Override
     protected void onStart()
@@ -228,10 +228,10 @@ public class Switches extends Activity{
 
     /**
      * Diese Methode speichert, die Werte vom Diagramm, falls das Tablet gedreht wurde. Also die Orientierung sich
-     * geändert hat. Denn bei einer neuen Orientierung, werden alle Objekte zerstört und wieder neu aufgebaut. Jedoch
-     * muss man sich selber um die speicherung der relevanten Daten kümmern.
+     * ge&auml;ndert hat. Denn bei einer neuen Orientierung, werden alle Objekte zerst&ouml;rt und wieder neu aufgebaut. Jedoch
+     * muss man sich selber um die speicherung der relevanten Daten k&uuml;mmern.
      *
-     * @param outStat variable vom Typ Bundle wird übergeben. Die Klasse Bundle hat viele Hilfsmethoden um Daten zu
+     * @param outStat variable vom Typ Bundle wird &uuml;bergeben. Die Klasse Bundle hat viele Hilfsmethoden um Daten zu
      *                speichern.
      */
     @Override
@@ -249,9 +249,8 @@ public class Switches extends Activity{
      * Diese Methode wird aufgerufen, um die zuvor gespeicherten Werte wieder abzurufen und die objekte neu zu
      * initialiseren.
      *
-     * @param savedInstanceState variable vom Typ Bundle wird übergeben, Die Klasse Bundle hat viele Hilfsmethoden
+     * @param savedInstanceState variable vom Typ Bundle wird &uuml;bergeben, Die Klasse Bundle hat viele Hilfsmethoden
      *                           um die Daten wieder abzrufen.
-     * @override die onRestoreInstanceState() Methode des Android Frameworks.
      */
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState)
@@ -291,14 +290,14 @@ public class Switches extends Activity{
 
     /**
      * Die executeAction Methode, ruft die Methode der Klasse SetTargetActionInvocation auf,
-     * um dem UPnP Gerät die Argumente bzw. Werte zu senden. Es wird geprüft ob es sich um einen Input oder Output
+     * um dem UPnP Ger&auml;t die Argumente bzw. Werte zu senden. Es wird gepr&uuml;ft ob es sich um einen Input oder Output
      * Argument handelt, dass mit neuen Werten versorgt werden soll.
      *
-     * @param upnpService das upnpservice des jeweiligen UPnP Gerätes wird erwartet.
-     * @param action die action vom jeweiligen UPnP Gerät wird erwartet.
-     * @param action_argument das Action Argument vom UPnP Gerät wird erwartet.
-     * @param input_value der eigentliche Wert der an das UPnP Gerät gesendet werden soll, wird erwartet.
-     * @param isInput es wird geprüft ob es sich um einen Input oder Output Wert handelt.
+     * @param upnpService das upnpservice des jeweiligen UPnP Ger&auml;tes wird erwartet.
+     * @param action die action vom jeweiligen UPnP Ger&auml;t wird erwartet.
+     * @param action_argument das Action Argument vom UPnP Ger&auml;t wird erwartet.
+     * @param input_value der eigentliche Wert der an das UPnP Ger&auml;t gesendet werden soll, wird erwartet.
+     * @param isInput es wird gepr&uuml;ft ob es sich um einen Input oder Output Wert handelt.
      */
     protected void executeAction(AndroidUpnpService upnpService, final Action action,
                                  final ActionArgument action_argument, ArrayList input_value, boolean isInput)
@@ -330,13 +329,13 @@ public class Switches extends Activity{
     }
 
     /**
-     * In dieser Methode werden die Buttons erzeugt für die InputActions. Die Buttons bekommen einen Tag,
-     * um später zuordnen zu können zur welcher Action das jewelige Button gehört. Die Methode executeAction wird
-     * aufgerufen und die entsprechenden boolean Werte übergeben. Abhängig davon in welcher Stellung der Button ist
+     * In dieser Methode werden die Buttons erzeugt f&uuml;r die InputActions. Die Buttons bekommen einen Tag,
+     * um sp&auml;ter zuordnen zu k&ouml;nnen zur welcher Action das jewelige Button geh&ouml;rt. Die Methode executeAction wird
+     * aufgerufen und die entsprechenden boolean Werte &uuml;bergeben. Abh&auml;ngig davon in welcher Stellung der Button ist
      * (AN oder AUS).
      *
-     * @param action die action vom jeweiligen UPnP Gerät wird erwartet.
-     * @param action_argument das Action Argument vom UPnP Gerät wird erwartet.
+     * @param action die action vom jeweiligen UPnP Ger&auml;t wird erwartet.
+     * @param action_argument das Action Argument vom UPnP Ger&auml;t wird erwartet.
      */
     public void createInputActions(final Action action, final ActionArgument action_argument)
     {
@@ -373,13 +372,13 @@ public class Switches extends Activity{
     }
 
     /**
-     * In dieser Methode werden die Buttons erzeugt für die OutputActions. Die Buttons bekommen einen Tag,
-     * um später zuordnen zu können zur welcher Action das jewelige Button gehört. Sobald ein OutputButton betätigt
-     * wurde, wir die Methode setOnClickListener aufgerufen und daraufhin die executeAction Methode um dem UPnP Gerät
+     * In dieser Methode werden die Buttons erzeugt f&uuml;r die OutputActions. Die Buttons bekommen einen Tag,
+     * um sp&auml;ter zuordnen zu k&ouml;nnen zur welcher Action das jewelige Button geh&ouml;rt. Sobald ein OutputButton bet&auml;tigt
+     * wurde, wir die Methode setOnClickListener aufgerufen und daraufhin die executeAction Methode um dem UPnP Ger&auml;t
      * den neuen Wert zu senden.
      *
-     * @param action die action vom jeweiligen UPnP Gerät wird erwartet.
-     * @param action_argument das Action Argument vom UPnP Gerät wird erwartet.
+     * @param action die action vom jeweiligen UPnP Ger&auml;t wird erwartet.
+     * @param action_argument das Action Argument vom UPnP Ger&auml;t wird erwartet.
      */
     public void createOutPutActions(final Action action, final ActionArgument action_argument)
     {
@@ -402,14 +401,14 @@ public class Switches extends Activity{
     }
 
     /**
-     * In dieser Methode werden die SeekBar erzeugt für die InputActions. Das jeweilige SeekBar bekommt einen Tag,
-     * um später zuordnen zu können zur welcher Action das SeekBar gehört. Die Methode prüft ob und wann der
-     * Schiebeschalter betätigt und wieder losgelassen wurde. Dementsprechend werden die Informationen über die
-     * SeekBar aktualisiert und der neue Wert an die Methode executeAction() übergeben.
+     * In dieser Methode werden die SeekBar erzeugt f&uuml;r die InputActions. Das jeweilige SeekBar bekommt einen Tag,
+     * um sp&auml;ter zuordnen zu k&ouml;nnen zur welcher Action das SeekBar geh&ouml;rt. Die Methode pr&uuml;ft ob und wann der
+     * Schiebeschalter bet&auml;tigt und wieder losgelassen wurde. Dementsprechend werden die Informationen &uuml;ber die
+     * SeekBar aktualisiert und der neue Wert an die Methode executeAction() &uuml;bergeben.
      *
-     * @param service der Service vom UPnP Gerät wird erwartet.
-     * @param action die action vom jeweiligen UPnP Gerät wird erwartet.
-     * @param action_argument das Action Argument vom UPnP Gerät wird erwartet.
+     * @param service der Service vom UPnP Ger&auml;t wird erwartet.
+     * @param action die action vom jeweiligen UPnP Ger&auml;t wird erwartet.
+     * @param action_argument das Action Argument vom UPnP Ger&auml;t wird erwartet.
      */
     public void createSeekBarActions(final Service service, final Action action, final ActionArgument action_argument)
     {
@@ -470,9 +469,12 @@ public class Switches extends Activity{
     }
 
     /**
-     * Diese Methode wird aufgerufen, wenn ein GENA Event eingegangen ist.
-     * @param is_checked
-     * @param action
+     * Diese Methode wird aufgerufen, wenn ein GENA Event eingegangen ist. Nachdem das GENA Event ausgewertet wurde,
+     * in der Klasse SwitchPowerSubscriptionCallback, wird diese Methode aufgerufen um den Switch Status zu
+     * aktualisieren.
+     *
+     * @param is_checked welchen Wert der Switch bekommen soll.
+     * @param action durch den action parameter wird der der Tag name des Switches ermittelt.
      */
     public void setSwitch(final boolean is_checked,final Action action)
     {
@@ -489,6 +491,14 @@ public class Switches extends Activity{
         });
     }
 
+    /**
+     * Diese Methode wird aufgerufen, wenn ein GENA Event eingegangen ist. Nachdem das GENA Event ausgewertet wurde,
+     * in der Klasse SwitchPowerSubscriptionCallback, wird diese Methode aufgerufen um den SeekBar Status zu
+     * aktualisieren.
+     *
+     * @param value neuer Wert f&uuml;r das SeekBar.
+     * @param action durch den action parameter wird der der Tag name des Switches ermittelt.
+     */
     public void setSeekBar(final String value, final  Action action)
     {
         runOnUiThread(new Runnable()
@@ -504,6 +514,11 @@ public class Switches extends Activity{
         });
     }
 
+    /**
+     * In dieser Methode wird die Statevariable angemeldet und das horchen nach neuen GENA Events gestartet.
+     * Zusätzlich wird das Diagramm vorbereitet für die endgültige Darstellung.
+     * @param state_variable
+     */
     private void startEventlistening(StateVariable state_variable)
     {
         subscription_list.add(new SwitchPowerSubscriptionCallback(state_variable, this,
@@ -547,6 +562,14 @@ public class Switches extends Activity{
 
     }
 
+    /**
+     * In dieser Methode wird der Service vom UPnP Ger&auml;t genauer untersucht. Je nachdem um was f&uuml;r eine Action es
+     * sich handelt, wir das entsprechende GUI Element erzeugt. Dabei ist wichtig zu untersuchen,
+     * um welchen Typ es sich handelt bei der Action. Es werden nur Actions vom Typ Boolean oder UI1 durchgelassen.
+     *
+     * @param service der Service vom UPnP Ger&auml;t wird erwartet.
+     * @param action die action vom jeweiligen UPnP Ger&auml;t wird erwartet.
+     */
     private void generateUI(Service service, Action action)
     {
 
@@ -573,6 +596,14 @@ public class Switches extends Activity{
 
     }
 
+    /**
+     * Die Statevariablen vom UPnP Ger&auml;t, werden in dieser Methode ausgewertet und gefilter. Es werden Statevariablen
+     * nur vom Typ Boolean oder UI1 verarbeitet. Anschlie&szlig;end wird die Statevariable, die eine der Bedingung erf&uuml;llt,
+     * einer Liste hinzugef&uuml;gt und anschlie&szlig;end wir diese Liste mit den Statevariablen an die Methode
+     * startEventlistening() weiter gereicht, um die GENA Anmeldung zu starten.
+     *
+     * @param service der Service vom UPnP Ger&auml;t wird erwartet.
+     */
     private void setSubscription(Service service)
     {
         for (StateVariable stateVariable : service.getStateVariables())
@@ -589,6 +620,13 @@ public class Switches extends Activity{
         }
     }
 
+    /**
+     * Diese Methode hat einfach nur die Aufgabe, eine entsprechende Meldung auf dem Tablet anzuzeigen. Es kann f&uuml;r
+     * jeden Zweck genutzt werden. Sei es Fehlermeldung, oder eine Information die man dem Nutzer mitteilen m&ouml;chte.
+     *
+     * @param msg die Nachricht die angezeigt werden soll.
+     * @param longLength wie lange es angezeigt werden soll.
+     */
     protected void showToast(final String msg, final boolean longLength)
     {
         runOnUiThread(new Runnable() {
@@ -602,6 +640,12 @@ public class Switches extends Activity{
         });
     }
 
+    /**
+     * Diese Methode wird durchlaufen um die allgemeinen Informationen &uuml;ber das UPnP Ger&auml;t anzuzeigen. Zudem soll
+     * angezeigt werden, ob die Statevariable noch angemeldet ist oder nicht.
+     *
+     * @param upnp_device die Referenz vom UPnP Ger&auml;t wird erwartet. um die Informationen &uuml;ber das Ger&auml;t einzholen.
+     */
     public void createUPnPServiceandActionInformations(Device upnp_device)
     {
         LinearLayout ll;
@@ -673,6 +717,13 @@ public class Switches extends Activity{
 
     }
 
+    /**
+     * Diese Methode wird aufgerufen, wenn man einen neuen Punkt im Diagramm eintragen m&ouml;chte. Zudem hat diese
+     * Methode die Aufgabe, die Zyklen der GENA Events aufzuzeichnen.
+     *
+     * @param x Die x Koordinate, in diesem Falle die Anzahl der Event Zyklen.
+     * @param y Die y Koordinate, in diesem Falle der Wert, welcher dem UPnP Ger&auml;t gesendet wurde.
+     */
     public void addnewPoint(int x, int y){
         addBoolData( x,y );
         if (mChart != null){
@@ -681,6 +732,10 @@ public class Switches extends Activity{
         }
     }
 
+    /**
+     * Diese Methode wird von der Klasse SwitchPowerSubscriptionCallback aufgerufen,
+     * um den Status der Statevariable aktuell zu halten. Ob die Statevariable noch angemeldet ist oder nicht.
+     */
     public void updateGENAStatusTextView()
     {
         runOnUiThread(new Runnable()
@@ -706,6 +761,14 @@ public class Switches extends Activity{
         });
     }
 
+    /**
+     /**
+     * Das Standard Men&uuml; der Activity wird initialisiert, wenn der User w&uuml;nscht, eine manuelle Suche zu starten. Kann
+     * der User &uuml;ber das Android Standard Activity Men&uuml;, eine neue Suche starten.
+     * @param menu das Men&uuml; Parameter wird automatisch
+     *             vom Framework zur Laufzeit &uuml;bergeben.
+     * @return Diese Methode muss true zur&uuml;ck liefern, damit das Men&uuml; angezeigt wird.
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
@@ -713,6 +776,14 @@ public class Switches extends Activity{
         return true;
     }
 
+    /**
+     * Wenn aus dem Men&uuml; das Element ausgew&auml;hlt wurde, eine manuelle Suche zu starten.
+     * Wird diese Methode vom Framework aufgerufen. Um anschlie&szlig;end die Methode searchNetwork() aufzurufen.
+     *
+     * @param item Welches men&uuml; Element ausgew&auml;hlt wurde.
+     *             Anhand der ID kann festgestellt welches men&uuml; Element ausgew&auml;hlt wurde.
+     * @return Der R&uuml;ckgabewert ist false, sofern die ID nicht gefunden werden kann.
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
@@ -725,16 +796,33 @@ public class Switches extends Activity{
         return false;
     }
 
+    /**
+     * In dieser &ouml;ffentlichen Methode wird der Klasse SwitchPowerSubscriptionCallback die M&ouml;glichkeit geboten,
+     * den Status der Statevariable zu aktualisieren.
+     *
+     * @param status der neue Status als Boolean.
+     */
     public void setStateVariableStatus(boolean status)
     {
         statevariable_gone_offline = status;
     }
 
+    /**
+     * &Ouml;ffentliche Methode um den Status der Statevariable abzufragen.
+     *
+     * @return boolean Wert der Statevariable
+     */
     public boolean getStateVariableStatus()
     {
         return this.statevariable_gone_offline;
     }
 
+    /**
+     * Diese Methode dient dazu, um ein UPnP Ger&auml;t, dessen GENA Event verloren ging, wiederherzustellen.
+     * der Zyklus Counter wird hochgez&auml;hlt, damit die Kurve im Diagramm sich nicht &uuml;berlagert,
+     * sondern genau dort weiter macht, wo das GENA Event zuletzt abgebrochen wurde.
+     *
+     */
     private void reestablish_gena()
     {
         if(statevariable_gone_offline)
